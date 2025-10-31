@@ -31,6 +31,24 @@ const userSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  inventorySetup: {
+    isCompleted: {
+      type: Boolean,
+      default: false
+    },
+    clientCode: {
+      type: String,
+      sparse: true,
+      unique: true
+    },
+    industry: {
+      type: String,
+      enum: ['grocery', 'electronics', 'pharmaceutical', 'textile', 'automotive', 'construction', 'manufacturing', 'other']
+    },
+    setupCompletedAt: {
+      type: Date
+    }
   }
 }, {
   timestamps: true
