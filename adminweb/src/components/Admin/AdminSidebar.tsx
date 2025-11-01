@@ -9,6 +9,7 @@ import {
   CreditCard as CreditCardIcon,
   Analytics as AnalyticsIcon,
   ContactMail as ContactMailIcon,
+  Support as SupportIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
 
@@ -24,6 +25,7 @@ const navigation = [
   { name: 'Contact Management', href: '/admin/contacts', icon: ContactMailIcon },
   { name: 'Subscription Management', href: '/admin/subscriptions', icon: CreditCardIcon },
   { name: 'Analytics', href: '/admin/analytics', icon: AnalyticsIcon },
+  { name: 'Support Tickets', href: '/admin/support', icon: SupportIcon },
 ];
 
 export default function AdminSidebar({ isOpen, onToggle }: AdminSidebarProps) {

@@ -37,10 +37,15 @@ export const api = {
   // Contacts API (AdminWeb internal)
   contacts: '/api/contacts',
 
+  // Support Tickets API
+  supportTickets: '/api/support-tickets',
+  adminSupportTickets: '/api/admin/support-tickets',
+
   // Backend APIs (external, use buildUrl)
   backend: {
     inventorySetup: '/api/inventory-setup',
-    contacts: '/api/admin/contacts'
+    contacts: '/api/admin/contacts',
+    supportTickets: '/api/admin/support-tickets'
   },
 
   // Subscription endpoints

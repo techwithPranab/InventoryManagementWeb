@@ -14,7 +14,7 @@ export default function CustomerSupport() {
     email: '',
     subject: '',
     priority: 'medium',
-    category: 'general',
+    category: 'general-inquiry',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,9 +53,26 @@ export default function CustomerSupport() {
     setSubmitStatus('idle');
 
     try {
-      // Here you would typically send the form data to your backend
-      // For now, we'll simulate a successful submission
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch(api.supportTickets, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerName: formData.name,
+          customerEmail: formData.email,
+          subject: formData.subject,
+          category: formData.category,
+          priority: formData.priority,
+          message: formData.message
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit support ticket');
+      }
+
+      const data = await response.json();
 
       setSubmitStatus('success');
       setFormData({
@@ -63,10 +80,11 @@ export default function CustomerSupport() {
         email: '',
         subject: '',
         priority: 'medium',
-        category: 'general',
+        category: 'general-inquiry',
         message: ''
       });
     } catch (error) {
+      console.error('Error submitting support ticket:', error);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -121,6 +139,17 @@ export default function CustomerSupport() {
     'Integration Help',
     'Security Concern'
   ];
+
+  const categoryMapping = {
+    'General Inquiry': 'general-inquiry',
+    'Technical Support': 'technical-support',
+    'Billing & Account': 'billing-account',
+    'Feature Request': 'feature-request',
+    'Bug Report': 'bug-report',
+    'Training & Onboarding': 'training-onboarding',
+    'Integration Help': 'integration-help',
+    'Security Concern': 'security-concern'
+  };
 
   if (loading) {
     return (
@@ -275,7 +304,7 @@ export default function CustomerSupport() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       {categories.map((category) => (
-                        <option key={category} value={category.toLowerCase().replace(/\s+/g, '-')}>
+                        <option key={category} value={categoryMapping[category as keyof typeof categoryMapping]}>
                           {category}
                         </option>
                       ))}
