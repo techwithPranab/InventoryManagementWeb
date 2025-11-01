@@ -294,7 +294,7 @@ router.patch('/users/:userId', adminAuth, async (req, res) => {
 
     if (action === 'approve') {
       user.status = 'approved';
-      user.role = role || 'staff';
+      user.role = role || 'client';
       user.approvedAt = new Date();
       user.approvedBy = req.user._id;
     } else if (action === 'reject') {
@@ -311,6 +311,8 @@ router.patch('/users/:userId', adminAuth, async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        mobileNo: user.mobileNo,
+        industry: user.industry,
         status: user.status,
         role: user.role,
         approvedAt: user.approvedAt,
@@ -393,27 +395,31 @@ router.get('/analytics', adminAuth, async (req, res) => {
       yearly: revenueData.reduce((sum, item) => sum + item.revenue, 0)
     };
 
-    // Get setup progress (mock data since we don't track this in backend)
+    // Get inventory stats from approved users
+    const approvedUsers = await User.find({ status: 'approved' }).lean();
+    const totalSetups = approvedUsers.length;
+    const completedSetups = 0; // No longer tracking setup completion in User model
+
+    // Get setup progress based on approved users (simplified)
+    const pendingSetups = approvedUsers.length;
     const setupProgress = {
       labels: ['Pending', 'In Progress', 'Completed', 'Failed'],
-      data: [3, 2, 9, 1]
+      data: [pendingSetups, 0, 0, 0] // All approved users are pending setup
     };
 
-    // Get plan distribution (mock data)
+    // Get plan distribution (mock data for now since users don't have plans)
     const planDistribution = {
       labels: ['Free', 'Starter', 'Professional', 'Enterprise'],
-      data: [450, 320, 280, 197]
+      data: [approvedUsers.length, 0, 0, 0] // All approved users are Free for now
     };
-
-    // Get inventory stats
-    const totalSetups = 15;
-    const completedSetups = 9;
 
     res.json({
       totalUsers,
       activeUsers,
       totalSetups,
       completedSetups,
+      inProgressSetups: 0,
+      failedSetups: 0,
       revenue,
       userGrowth,
       setupProgress,
@@ -437,84 +443,290 @@ router.get('/inventory-setups', adminAuth, async (req, res) => {
       plan
     } = req.query;
 
-    // Mock inventory setup data since we don't track this in backend
-    // In a real implementation, this would come from a separate collection
-    const mockSetups = [
-      {
-        _id: '1',
-        ownerName: 'John Doe',
-        email: 'john@example.com',
-        industry: 'Grocery',
-        subscriptionPlan: 'Enterprise',
-        clientCode: 'ABC12345',
-        databaseName: 'inventory_management_ABC12345',
-        setupStatus: 'completed',
-        setupCompletedAt: '2024-01-15T10:00:00Z',
-        createdAt: '2024-01-10T08:00:00Z',
-        setupProgress: {
-          categoriesCreated: true,
-          warehousesCreated: true,
-          productsAdded: true,
-          initialInventorySet: true
-        }
-      },
-      {
-        _id: '2',
-        ownerName: 'Jane Smith',
-        email: 'jane@example.com',
-        industry: 'Electronics',
-        subscriptionPlan: 'Professional',
-        clientCode: 'DEF67890',
-        databaseName: 'inventory_management_DEF67890',
-        setupStatus: 'in_progress',
-        createdAt: '2024-01-12T09:00:00Z',
-        setupProgress: {
-          categoriesCreated: true,
-          warehousesCreated: true,
-          productsAdded: false,
-          initialInventorySet: false
-        }
-      },
-      {
-        _id: '3',
-        ownerName: 'Bob Johnson',
-        email: 'bob@example.com',
-        industry: 'Pharmaceutical',
-        subscriptionPlan: 'Starter',
-        clientCode: 'GHI11111',
-        databaseName: 'inventory_management_GHI11111',
-        setupStatus: 'pending',
-        createdAt: '2024-01-14T11:00:00Z',
-        setupProgress: {
-          categoriesCreated: false,
-          warehousesCreated: false,
-          productsAdded: false,
-          initialInventorySet: false
-        }
-      }
-    ];
+    // Get approved users and create inventory setup data from them
+    let userQuery = { status: 'approved' };
 
-    // Filter by status and plan
-    let filteredSetups = mockSetups;
-    if (status) {
-      filteredSetups = filteredSetups.filter(setup => setup.setupStatus === status);
-    }
     if (plan) {
-      filteredSetups = filteredSetups.filter(setup => setup.subscriptionPlan === plan);
+      // Note: Users don't have subscriptionPlan field, so we'll skip this filter for now
+      // In a real implementation, users would have a subscription plan
     }
 
-    // Paginate
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedSetups = filteredSetups.slice(startIndex, endIndex);
+    const users = await User.find(userQuery)
+      .populate('approvedBy', 'name email')
+      .sort({ approvedAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .lean();
+
+    const total = await User.countDocuments(userQuery);
+
+    // Transform users into inventory setup format (simplified without inventorySetup)
+    const setups = users.map(user => ({
+      _id: user._id,
+      ownerName: user.name,
+      email: user.email,
+      mobileNo: user.mobileNo,
+      industry: user.industry,
+      subscriptionPlan: 'Free', // Default plan since users don't have subscription info
+      clientCode: `CLIENT${user._id.toString().slice(-6).toUpperCase()}`,
+      databaseName: `inventory_${user._id.toString()}`,
+      setupStatus: 'pending', // All setups are pending since we removed tracking
+      setupCompletedAt: null,
+      createdAt: user.approvedAt || user.createdAt,
+      setupProgress: {
+        categoriesCreated: false,
+        warehousesCreated: false,
+        productsAdded: false,
+        initialInventorySet: false
+      }
+    }));
+
+    // Filter by status if provided
+    let filteredSetups = setups;
+    if (status) {
+      filteredSetups = setups.filter(setup => setup.setupStatus === status);
+    }
 
     res.json({
-      setups: paginatedSetups,
+      setups: filteredSetups,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
         total: filteredSetups.length,
-        pages: Math.ceil(filteredSetups.length / limit)
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/admin/categories
+// @desc    Create a category for a client
+// @access  Private (Admin)
+router.post('/categories', [
+  adminAuth,
+  body('name').notEmpty().withMessage('Category name is required'),
+  body('description').optional()
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const clientId = req.headers['x-client-id'];
+    if (!clientId) {
+      return res.status(400).json({ message: 'Client ID is required' });
+    }
+
+    // Find user by client ID
+    const user = await User.findById(clientId);
+    if (!user) {
+      return res.status(404).json({ message: 'Client not found' });
+    }
+
+    // Create client-specific database connection
+    const dbName = `inventory_${user._id.toString()}`;
+    const baseUri = process.env.MONGODB_URI.substring(0, process.env.MONGODB_URI.lastIndexOf('/'));
+    const clientDbUri = `${baseUri}/${dbName}`;
+    const clientConnection = mongoose.createConnection(clientDbUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    await new Promise((resolve, reject) => {
+      clientConnection.once('open', resolve);
+      clientConnection.once('error', reject);
+    });
+
+    try {
+      // Create category in client database
+      const CategoryModel = clientConnection.model('Category', Category.schema);
+      const category = new CategoryModel(req.body);
+      await category.save();
+
+      await clientConnection.close();
+
+      res.json({
+        message: 'Category created successfully',
+        category
+      });
+    } catch (error) {
+      await clientConnection.close();
+      throw error;
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/admin/warehouses
+// @desc    Create a warehouse for a client
+// @access  Private (Admin)
+router.post('/warehouses', [
+  adminAuth,
+  body('name').notEmpty().withMessage('Warehouse name is required'),
+  body('code').notEmpty().withMessage('Warehouse code is required'),
+  body('address').isObject().withMessage('Address is required'),
+  body('capacity').isNumeric().withMessage('Capacity must be a number'),
+  body('type').isIn(['primary', 'secondary', 'distribution']).withMessage('Invalid warehouse type')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const clientId = req.headers['x-client-id'];
+    if (!clientId) {
+      return res.status(400).json({ message: 'Client ID is required' });
+    }
+
+    // Find user by client ID
+    const user = await User.findById(clientId);
+    if (!user) {
+      return res.status(404).json({ message: 'Client not found' });
+    }
+
+    // Create client-specific database connection
+    const dbName = `inventory_${user._id.toString()}`;
+    const baseUri = process.env.MONGODB_URI.substring(0, process.env.MONGODB_URI.lastIndexOf('/'));
+    const clientDbUri = `${baseUri}/${dbName}`;
+    const clientConnection = mongoose.createConnection(clientDbUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    await new Promise((resolve, reject) => {
+      clientConnection.once('open', resolve);
+      clientConnection.once('error', reject);
+    });
+
+    try {
+      // Create warehouse in client database
+      const WarehouseModel = clientConnection.model('Warehouse', Warehouse.schema);
+      const warehouse = new WarehouseModel(req.body);
+      await warehouse.save();
+
+      await clientConnection.close();
+
+      res.json({
+        message: 'Warehouse created successfully',
+        warehouse
+      });
+    } catch (error) {
+      await clientConnection.close();
+      throw error;
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/admin/products
+// @desc    Create a product for a client
+// @access  Private (Admin)
+router.post('/products', [
+  adminAuth,
+  body('name').notEmpty().withMessage('Product name is required'),
+  body('sku').notEmpty().withMessage('SKU is required'),
+  body('category').notEmpty().withMessage('Category is required'),
+  body('costPrice').isNumeric().withMessage('Cost price must be a number'),
+  body('sellingPrice').isNumeric().withMessage('Selling price must be a number'),
+  body('reorderLevel').isNumeric().withMessage('Reorder level must be a number'),
+  body('minStockLevel').isNumeric().withMessage('Minimum stock level must be a number')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const clientId = req.headers['x-client-id'];
+    if (!clientId) {
+      return res.status(400).json({ message: 'Client ID is required' });
+    }
+
+    // Find user by client ID
+    const user = await User.findById(clientId);
+    if (!user) {
+      return res.status(404).json({ message: 'Client not found' });
+    }
+
+    // Create client-specific database connection
+    const dbName = `inventory_${user._id.toString()}`;
+    const baseUri = process.env.MONGODB_URI.substring(0, process.env.MONGODB_URI.lastIndexOf('/'));
+    const clientDbUri = `${baseUri}/${dbName}`;
+    const clientConnection = mongoose.createConnection(clientDbUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    await new Promise((resolve, reject) => {
+      clientConnection.once('open', resolve);
+      clientConnection.once('error', reject);
+    });
+
+    try {
+      // Create product in client database
+      const ProductModel = clientConnection.model('Product', Product.schema);
+      const product = new ProductModel(req.body);
+      await product.save();
+
+      await clientConnection.close();
+
+      res.json({
+        message: 'Product created successfully',
+        product
+      });
+    } catch (error) {
+      await clientConnection.close();
+      throw error;
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/admin/inventory-setups/:clientId/complete
+// @desc    Mark inventory setup as completed for a client
+// @access  Private (Admin)
+router.post('/inventory-setups/:clientId/complete', adminAuth, async (req, res) => {
+  try {
+    const { clientId } = req.params;
+
+    // Find user by ID
+    const user = await User.findById(clientId);
+    if (!user) {
+      return res.status(404).json({ message: 'Client not found' });
+    }
+
+    // Update inventory setup status
+    
+    
+    await user.save();
+
+    res.json({
+      message: 'Inventory setup marked as completed',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        mobileNo: user.mobileNo
       }
     });
   } catch (error) {

@@ -8,6 +8,8 @@ interface User {
   _id: string;
   name: string;
   email: string;
+  mobileNo?: string;
+  industry?: string;
   role: string;
   status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
@@ -16,12 +18,6 @@ interface User {
     email: string;
   };
   approvedAt?: string;
-  inventorySetup: {
-    isCompleted: boolean;
-    warehouseCreated: boolean;
-    initialProductsAdded: boolean;
-    setupCompletedAt?: string;
-  };
 }
 
 interface PaginationInfo {
@@ -235,6 +231,7 @@ export default function UserManagement() {
                   <option value="admin">Admin</option>
                   <option value="manager">Manager</option>
                   <option value="staff">Staff</option>
+                  <option value="client">Client</option>
                 </select>
               </div>
             </div>
@@ -251,6 +248,7 @@ export default function UserManagement() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Industry</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
@@ -264,7 +262,13 @@ export default function UserManagement() {
                         <div>
                           <div className="text-sm font-medium text-gray-900">{user.name}</div>
                           <div className="text-sm text-gray-500">{user.email}</div>
+                          {user.mobileNo && (
+                            <div className="text-xs text-gray-400">{user.mobileNo}</div>
+                          )}
                         </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-900 capitalize">{user.industry || 'Not specified'}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.role)}`}>
@@ -298,9 +302,7 @@ export default function UserManagement() {
                         )}
                         {user.status === 'approved' && (
                           <div className="space-x-2">
-                            {user.inventorySetup.isCompleted && (
-                              <span className="text-green-600 text-sm">Setup Complete</span>
-                            )}
+                            <span className="text-green-600 text-sm">Approved</span>
                           </div>
                         )}
                         {user.status === 'rejected' && (

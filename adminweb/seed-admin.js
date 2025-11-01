@@ -39,8 +39,76 @@ const SubscriptionPlanSchema = new mongoose.Schema({
   stripePriceId: { type: String }
 }, { timestamps: true });
 
+// Contact Schema
+const ContactSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true
+  },
+  phone: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  address: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  privacyEmail: {
+    type: String,
+    trim: true,
+    lowercase: true,
+  },
+  legalEmail: {
+    type: String,
+    trim: true,
+    lowercase: true,
+  },
+  supportEmail: {
+    type: String,
+    trim: true,
+    lowercase: true,
+  },
+  businessName: {
+    type: String,
+    required: true,
+    trim: true,
+    default: 'Inventory Management System'
+  },
+  updatedBy: {
+    type: mongoose.Schema.Types.Mixed,
+  },
+  lastUpdated: {
+    type: String,
+  }
+}, {
+  timestamps: true
+});
+
+// Ensure only one contact document exists
+ContactSchema.pre('save', async function(next) {
+  if (this.isNew) {
+    const ContactModel = this.constructor;
+    const existingContact = await ContactModel.findOne();
+    if (existingContact) {
+      throw new Error('Contact information already exists. Use update instead.');
+    }
+  }
+  next();
+});
+
+// Update lastUpdated on save
+ContactSchema.pre('save', function(next) {
+  this.lastUpdated = new Date().toISOString();
+  next();
+});
+
 const User = mongoose.models.User || mongoose.model('User', UserSchema);
 const SubscriptionPlan = mongoose.models.SubscriptionPlan || mongoose.model('SubscriptionPlan', SubscriptionPlanSchema);
+const Contact = mongoose.models.Contact || mongoose.model('Contact', ContactSchema);
 
 // Hash password function
 async function hashPassword(password) {
@@ -189,6 +257,17 @@ const subscriptionPlans = [
   }
 ];
 
+const contactData = {
+  email: 'contact@inventorysystem.com',
+  phone: '+1 (555) 123-4567',
+  address: '123 Business Street, Suite 100, Business City, BC 12345',
+  privacyEmail: 'privacy@inventorysystem.com',
+  legalEmail: 'legal@inventorysystem.com',
+  supportEmail: 'support@inventorysystem.com',
+  businessName: 'Inventory Management System',
+  lastUpdated: new Date().toISOString()
+};
+
 async function seedSubscriptionPlans() {
   try {
     console.log('\n🌱 Seeding subscription plans...');
@@ -254,6 +333,61 @@ async function seedSubscriptionPlans() {
   }
 }
 
+async function seedContactData() {
+  try {
+    console.log('\n🌱 Seeding contact information...');
+
+    const existingContact = await Contact.findOne();
+
+    if (existingContact) {
+      // Update existing contact if it has changed
+      const hasChanges =
+        existingContact.email !== contactData.email ||
+        existingContact.phone !== contactData.phone ||
+        existingContact.address !== contactData.address ||
+        existingContact.privacyEmail !== contactData.privacyEmail ||
+        existingContact.legalEmail !== contactData.legalEmail ||
+        existingContact.supportEmail !== contactData.supportEmail ||
+        existingContact.businessName !== contactData.businessName;
+
+      if (hasChanges) {
+        await Contact.updateOne(
+          { _id: existingContact._id },
+          {
+            ...contactData,
+            updatedAt: new Date()
+          }
+        );
+        console.log('📝 Updated existing contact information');
+      } else {
+        console.log('ℹ️  Contact information is already up to date');
+      }
+    } else {
+      // Create new contact
+      const newContact = await Contact.create(contactData);
+      console.log('✨ Created new contact information');
+    }
+
+    // Show current contact info
+    const currentContact = await Contact.findOne();
+    if (currentContact) {
+      console.log('\n📋 Current contact information:');
+      console.log(`- Business Name: ${currentContact.businessName}`);
+      console.log(`- Email: ${currentContact.email}`);
+      console.log(`- Phone: ${currentContact.phone}`);
+      console.log(`- Address: ${currentContact.address}`);
+      console.log(`- Privacy Email: ${currentContact.privacyEmail}`);
+      console.log(`- Legal Email: ${currentContact.legalEmail}`);
+      console.log(`- Support Email: ${currentContact.supportEmail}`);
+    }
+
+    return currentContact;
+  } catch (error) {
+    console.error('❌ Error seeding contact data:', error);
+    throw error;
+  }
+}
+
 async function seedAdminUsers() {
   try {
     await mongoose.connect(MONGODB_URI, {
@@ -264,6 +398,9 @@ async function seedAdminUsers() {
 
     // Seed subscription plans first
     await seedSubscriptionPlans();
+
+    // Seed contact data
+    await seedContactData();
 
     // Check if admin users already exist
     const existingAdmins = await User.find({ role: 'admin' });
@@ -329,4 +466,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { seedAdminUsers, seedSubscriptionPlans, adminUsers, subscriptionPlans };
+module.exports = { seedAdminUsers, seedSubscriptionPlans, seedContactData, adminUsers, subscriptionPlans, contactData };

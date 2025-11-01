@@ -23,6 +23,7 @@ async function handler(req: AuthenticatedRequest) {
         name: user.name,
         email: user.email,
         role: user.role,
+        mobileNo: user.mobileNo,
         createdAt: user.createdAt
       }
     }, { status: 200 });

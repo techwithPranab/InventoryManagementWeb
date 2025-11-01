@@ -34,9 +34,13 @@ export const api = {
     inventorySetups: (params?: string) => params ? `/api/admin/inventory-setups?${params}` : '/api/admin/inventory-setups'
   },
 
+  // Contacts API (AdminWeb internal)
+  contacts: '/api/contacts',
+
   // Backend APIs (external, use buildUrl)
   backend: {
     inventorySetup: '/api/inventory-setup',
+    contacts: '/api/admin/contacts'
   },
 
   // Subscription endpoints

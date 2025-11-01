@@ -115,7 +115,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     };
 
     // If approving and role is provided, update role
-    if (action === 'approve' && role && ['admin', 'manager', 'staff'].includes(role)) {
+    if (action === 'approve' && role && ['admin', 'manager', 'staff', 'client'].includes(role)) {
       updateData.role = role;
     }
 

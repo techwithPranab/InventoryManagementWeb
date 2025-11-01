@@ -7,8 +7,13 @@ const { auth } = require('../middleware/auth');
 const router = express.Router();
 
 // Generate JWT Token
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+const generateToken = (user) => {
+  return jwt.sign({
+    id: user._id,
+    userId: user._id,
+    role: user.role,
+    email: user.email
+  }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE
   });
 };
@@ -20,7 +25,7 @@ router.post('/register', [
   body('name').trim().notEmpty().withMessage('Name is required'),
   body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('role').optional().isIn(['admin', 'manager', 'staff']).withMessage('Invalid role')
+  body('role').optional().isIn(['admin', 'manager', 'staff', 'client']).withMessage('Invalid role')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -31,7 +36,7 @@ router.post('/register', [
       });
     }
 
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, mobileNo, industry } = req.body;
 
     // Check if user already exists
     let user = await User.findOne({ email });
@@ -44,13 +49,15 @@ router.post('/register', [
       name,
       email,
       password,
-      role: role || 'staff'
+      role: role || 'client',
+      mobileNo,
+      industry
     });
 
     await user.save();
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     res.status(201).json({
       message: 'User registered successfully',
@@ -59,7 +66,9 @@ router.post('/register', [
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        mobileNo: user.mobileNo,
+        industry: user.industry
       }
     });
   } catch (error) {
@@ -104,7 +113,7 @@ router.post('/login', [
     }
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     res.json({
       message: 'Login successful',
@@ -113,7 +122,9 @@ router.post('/login', [
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        mobileNo: user.mobileNo,
+        industry: user.industry
       }
     });
   } catch (error) {
@@ -133,6 +144,8 @@ router.get('/me', auth, async (req, res) => {
         name: req.user.name,
         email: req.user.email,
         role: req.user.role,
+        mobileNo: req.user.mobileNo,
+        industry: req.user.industry,
         avatar: req.user.avatar,
         isActive: req.user.isActive,
         createdAt: req.user.createdAt
@@ -160,12 +173,14 @@ router.put('/profile', auth, [
       });
     }
 
-    const { name, email, avatar } = req.body;
+    const { name, email, avatar, mobileNo, industry } = req.body;
     const updateFields = {};
 
     if (name) updateFields.name = name;
     if (email) updateFields.email = email;
     if (avatar) updateFields.avatar = avatar;
+    if (mobileNo !== undefined) updateFields.mobileNo = mobileNo;
+    if (industry) updateFields.industry = industry;
 
     // Check if email already exists for another user
     if (email) {
@@ -191,6 +206,8 @@ router.put('/profile', auth, [
         name: user.name,
         email: user.email,
         role: user.role,
+        mobileNo: user.mobileNo,
+        industry: user.industry,
         avatar: user.avatar
       }
     });

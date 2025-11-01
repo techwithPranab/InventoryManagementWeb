@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     await dbConnect();
 
-    const { name, email, password, role } = await req.json();
+    const { name, email, password, role, contactNo, industry } = await req.json();
 
     // Validate required fields
     if (!name || !email || !password) {
@@ -51,7 +51,9 @@ export async function POST(req: NextRequest) {
       name: name.trim(),
       email: email.toLowerCase().trim(),
       password: hashedPassword,
-      role: role || 'staff'
+      role: role || 'staff',
+      mobileNo: contactNo?.trim(),
+      industry: industry
     });
 
     const savedUser = await newUser.save();
@@ -71,7 +73,9 @@ export async function POST(req: NextRequest) {
         id: savedUser._id,
         name: savedUser.name,
         email: savedUser.email,
-        role: savedUser.role
+        role: savedUser.role,
+        mobileNo: savedUser.mobileNo,
+        industry: savedUser.industry
       }
     }, { status: 201 });
 

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const User = require('./models/User');
+const Contact = require('./models/Contact');
 
 dotenv.config();
 
@@ -26,6 +27,52 @@ const adminUsers = [
     approvedBy: null // System created
   }
 ];
+
+// Default contact information from backend model
+const defaultContactData = {
+  email: 'contact@inventorysystem.com',
+  phone: '+1 (555) 123-4567',
+  address: '123 Business Street, Suite 100, Business City, BC 12345',
+  privacyEmail: 'privacy@inventorysystem.com',
+  legalEmail: 'legal@inventorysystem.com',
+  supportEmail: 'support@inventorysystem.com',
+  businessName: 'Inventory Management System',
+  updatedBy: null // System created
+};
+
+async function seedContactData() {
+  try {
+    // Check if contact information already exists
+    const existingContact = await Contact.findOne();
+    if (existingContact) {
+      console.log('Contact information already exists:');
+      console.log(`- Business: ${existingContact.businessName}`);
+      console.log(`- Email: ${existingContact.email}`);
+      console.log(`- Phone: ${existingContact.phone}`);
+      console.log('\nSkipping contact data creation to avoid duplicates.');
+      console.log('If you need to reset contact information, please do so manually or clear the Contact collection first.');
+      return;
+    }
+
+    // Create default contact information using backend Contact model
+    const contact = new Contact(defaultContactData);
+    await contact.save();
+
+    console.log('✅ Contact information created successfully!');
+    console.log('\n=== Default Contact Information ===');
+    console.log(`Business Name: ${contact.businessName}`);
+    console.log(`Primary Email: ${contact.email}`);
+    console.log(`Phone: ${contact.phone}`);
+    console.log(`Address: ${contact.address}`);
+    console.log(`Privacy Email: ${contact.privacyEmail}`);
+    console.log(`Legal Email: ${contact.legalEmail}`);
+    console.log(`Support Email: ${contact.supportEmail}`);
+
+  } catch (error) {
+    console.error('❌ Error seeding contact data:', error);
+    throw error; // Re-throw to be handled by caller
+  }
+}
 
 async function seedAdminUsers() {
   try {
@@ -58,6 +105,9 @@ async function seedAdminUsers() {
       }
     }
 
+    // Seed contact information
+    await seedContactData();
+
     console.log('\n=== Admin Portal Access ===');
     console.log('Admin Login URL: http://localhost:3000/admin/login');
     console.log('Admin Dashboard: http://localhost:3000/admin (after login)');
@@ -79,4 +129,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { seedAdminUsers, adminUsers };
+module.exports = { seedAdminUsers, seedContactData, adminUsers, defaultContactData };

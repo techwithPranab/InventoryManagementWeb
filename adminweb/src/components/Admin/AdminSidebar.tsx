@@ -8,6 +8,7 @@ import {
   Inventory as InventoryIcon,
   CreditCard as CreditCardIcon,
   Analytics as AnalyticsIcon,
+  ContactMail as ContactMailIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
 
@@ -20,6 +21,7 @@ const navigation = [
   { name: 'Dashboard', href: '/admin', icon: HomeIcon },
   { name: 'User Management', href: '/admin/users', icon: PeopleIcon },
   { name: 'Inventory Management', href: '/admin/inventory', icon: InventoryIcon },
+  { name: 'Contact Management', href: '/admin/contacts', icon: ContactMailIcon },
   { name: 'Subscription Management', href: '/admin/subscriptions', icon: CreditCardIcon },
   { name: 'Analytics', href: '/admin/analytics', icon: AnalyticsIcon },
 ];

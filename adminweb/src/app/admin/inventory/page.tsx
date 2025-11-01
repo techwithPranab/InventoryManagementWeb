@@ -339,6 +339,7 @@ export default function InventoryManagement() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Database</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -379,10 +380,39 @@ export default function InventoryManagement() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(setup.createdAt).toLocaleDateString()}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        {setup.setupStatus === 'pending' && (
+                          <button
+                            onClick={() => router.push(`/admin/inventory/setup/${setup._id}`)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm font-medium"
+                          >
+                            Setup Inventory
+                          </button>
+                        )}
+                        {setup.setupStatus === 'in_progress' && (
+                          <button
+                            onClick={() => router.push(`/admin/inventory/setup/${setup._id}`)}
+                            className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded-md text-sm font-medium"
+                          >
+                            Continue Setup
+                          </button>
+                        )}
+                        {setup.setupStatus === 'completed' && (
+                          <span className="text-green-600 font-medium">Completed</span>
+                        )}
+                        {setup.setupStatus === 'failed' && (
+                          <button
+                            onClick={() => router.push(`/admin/inventory/setup/${setup._id}`)}
+                            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm font-medium"
+                          >
+                            Retry Setup
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   )) : (
                     <tr>
-                      <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                      <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                         <div className="flex flex-col items-center">
                           <svg className="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />

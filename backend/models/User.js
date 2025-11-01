@@ -14,6 +14,14 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     trim: true
   },
+  mobileNo: {
+    type: String,
+    trim: true
+  },
+  industry: {
+    type: String,
+    enum: ['grocery', 'electronics', 'pharmaceutical', 'textile', 'automotive', 'construction', 'manufacturing', 'other']
+  },
   password: {
     type: String,
     required: [true, 'Password is required'],
@@ -21,8 +29,13 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'manager', 'staff'],
-    default: 'staff'
+    enum: ['admin', 'manager', 'staff', 'client'],
+    default: 'client'
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
   },
   avatar: {
     type: String,
@@ -32,23 +45,12 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  inventorySetup: {
-    isCompleted: {
-      type: Boolean,
-      default: false
-    },
-    clientCode: {
-      type: String,
-      sparse: true,
-      unique: true
-    },
-    industry: {
-      type: String,
-      enum: ['grocery', 'electronics', 'pharmaceutical', 'textile', 'automotive', 'construction', 'manufacturing', 'other']
-    },
-    setupCompletedAt: {
-      type: Date
-    }
+  approvedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  approvedAt: {
+    type: Date
   }
 }, {
   timestamps: true

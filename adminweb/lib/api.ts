@@ -24,9 +24,13 @@ export const api = {
     userById: (userId: string) => `/api/admin/users/${userId}`,
   },
 
+  // Contacts API (AdminWeb internal)
+  contacts: '/api/contacts',
+
   // Backend APIs (external, use buildUrl)
   backend: {
     inventorySetup: () => '/api/admin/inventory-setup',
     inventoryStatus: (userId: string) => `/api/admin/inventory-setup/${userId}`,
+    contacts: '/api/admin/contacts',
   },
 };

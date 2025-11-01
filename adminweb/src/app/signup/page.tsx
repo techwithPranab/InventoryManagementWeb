@@ -13,16 +13,20 @@ export default function Signup() {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'staff'
+    contactNo: '',
+    industry: '',
+    role: 'client',
+    consent: false
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type, checked } = e.target as HTMLInputElement;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: type === 'checkbox' ? checked : value
     });
     setError(''); // Clear error when user starts typing
   };
@@ -39,6 +43,13 @@ export default function Signup() {
       return;
     }
 
+    // Validate consent checkbox
+    if (!formData.consent) {
+      setError('Please agree to the terms and conditions');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(api.auth.signup, {
         method: 'POST',
@@ -48,6 +59,8 @@ export default function Signup() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
+          contactNo: formData.contactNo,
+          industry: formData.industry,
           password: formData.password,
           role: formData.role
         }),
@@ -77,7 +90,7 @@ export default function Signup() {
       <Header />
       
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+        <div className="max-w-2xl w-full space-y-8">
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
               Create your account
@@ -94,92 +107,121 @@ export default function Signup() {
           </div>
           
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Full Name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="name"
-                  required
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="Enter your full name"
-                  value={formData.name}
-                  onChange={handleChange}
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Left Column */}
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                    Full Name
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    autoComplete="name"
+                    required
+                    className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Enter your full name"
+                    value={formData.name}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="contactNo" className="block text-sm font-medium text-gray-700">
+                    Contact Number
+                  </label>
+                  <input
+                    id="contactNo"
+                    name="contactNo"
+                    type="tel"
+                    autoComplete="tel"
+                    required
+                    className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Enter your contact number"
+                    value={formData.contactNo}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    minLength={6}
+                    className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Enter your password (min 6 characters)"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
 
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="Enter your email address"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-              </div>
+              {/* Right Column */}
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email Address
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Enter your email address"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </div>
 
-              <div>
-                <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                  Role
-                </label>
-                <select
-                  id="role"
-                  name="role"
-                  required
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={formData.role}
-                  onChange={handleChange}
-                >
-                  <option value="staff">Staff</option>
-                  <option value="manager">Manager</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
+                <div>
+                  <label htmlFor="industry" className="block text-sm font-medium text-gray-700">
+                    Industry
+                  </label>
+                  <select
+                    id="industry"
+                    name="industry"
+                    required
+                    className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    value={formData.industry}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select your industry</option>
+                    <option value="grocery">Grocery</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="pharmaceutical">Pharmaceutical</option>
+                    <option value="textile">Textile</option>
+                    <option value="automotive">Automotive</option>
+                    <option value="construction">Construction</option>
+                    <option value="manufacturing">Manufacturing</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  minLength={6}
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="Enter your password (min 6 characters)"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                  Confirm Password
-                </label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="Confirm your password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                />
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                    Confirm Password
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
             </div>
 
@@ -188,6 +230,28 @@ export default function Signup() {
                 {error}
               </div>
             )}
+
+            <div className="flex items-center">
+              <input
+                id="consent"
+                name="consent"
+                type="checkbox"
+                required
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                checked={formData.consent}
+                onChange={handleChange}
+              />
+              <label htmlFor="consent" className="ml-2 block text-sm text-gray-900">
+                I agree to the{' '}
+                <Link href="/terms" className="text-blue-600 hover:text-blue-500">
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link href="/privacy" className="text-blue-600 hover:text-blue-500">
+                  Privacy Policy
+                </Link>
+              </label>
+            </div>
 
             <div>
               <button

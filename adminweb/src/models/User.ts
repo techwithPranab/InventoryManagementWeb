@@ -4,19 +4,14 @@ export interface IUser extends Document {
   _id: string;
   name: string;
   email: string;
+  mobileNo?: string;
+  industry?: string;
   password: string;
-  role: 'admin' | 'manager' | 'staff';
+  role: 'admin' | 'manager' | 'staff' | 'client';
   status: 'pending' | 'approved' | 'rejected';
   isActive: boolean;
   approvedBy?: mongoose.Types.ObjectId;
   approvedAt?: Date;
-  inventorySetup: {
-    isCompleted: boolean;
-    clientCode?: string;
-    industry?: string;
-    databaseName?: string;
-    setupCompletedAt?: Date;
-  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,6 +31,15 @@ const UserSchema = new Schema<IUser>({
     trim: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
   },
+  mobileNo: {
+    type: String,
+    trim: true,
+    match: [/^[0-9+\-\s()]+$/, 'Please enter a valid mobile number']
+  },
+  industry: {
+    type: String,
+    enum: ['grocery', 'electronics', 'pharmaceutical', 'textile', 'automotive', 'construction', 'manufacturing', 'other']
+  },
   password: {
     type: String,
     required: [true, 'Password is required'],
@@ -43,8 +47,8 @@ const UserSchema = new Schema<IUser>({
   },
   role: {
     type: String,
-    enum: ['admin', 'manager', 'staff'],
-    default: 'staff'
+    enum: ['admin', 'manager', 'staff', 'client'],
+    default: 'client'
   },
   status: {
     type: String,
@@ -61,27 +65,6 @@ const UserSchema = new Schema<IUser>({
   },
   approvedAt: {
     type: Date
-  },
-  inventorySetup: {
-    isCompleted: {
-      type: Boolean,
-      default: false
-    },
-    clientCode: {
-      type: String,
-      sparse: true,
-      unique: true
-    },
-    industry: {
-      type: String,
-      enum: ['grocery', 'electronics', 'pharmaceutical', 'textile', 'automotive', 'construction', 'manufacturing', 'other']
-    },
-    databaseName: {
-      type: String
-    },
-    setupCompletedAt: {
-      type: Date
-    }
   }
 }, {
   timestamps: true
