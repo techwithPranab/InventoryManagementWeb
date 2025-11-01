@@ -29,12 +29,14 @@ export const api = {
   admin: {
     users: (params?: string) => params ? `/api/admin/users?${params}` : '/api/admin/users',
     userById: (userId: string) => `/api/admin/users/${userId}`,
-    dashboard: '/api/admin/dashboard'
+    dashboard: '/api/admin/dashboard',
+    analytics: (params?: string) => params ? `/api/admin/analytics?${params}` : '/api/admin/analytics',
+    inventorySetups: (params?: string) => params ? `/api/admin/inventory-setups?${params}` : '/api/admin/inventory-setups'
   },
 
   // Backend APIs (external, use buildUrl)
   backend: {
-    // Inventory setup is handled by the backend service
+    inventorySetup: '/api/inventory-setup',
   },
 
   // Subscription endpoints
