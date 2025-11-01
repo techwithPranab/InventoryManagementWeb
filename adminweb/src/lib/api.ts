@@ -45,7 +45,15 @@ export const api = {
   backend: {
     inventorySetup: '/api/inventory-setup',
     contacts: '/api/admin/contacts',
-    supportTickets: '/api/admin/support-tickets'
+    supportTickets: '/api/admin/support-tickets',
+    dashboard: {
+      overview: '/api/dashboard/overview',
+      recentActivities: '/api/dashboard/recent-activities',
+      inventoryAlerts: '/api/dashboard/inventory-alerts',
+      topProducts: '/api/dashboard/top-products',
+      salesChart: '/api/dashboard/sales-chart',
+      warehouseSummary: '/api/dashboard/warehouse-summary'
+    }
   },
 
   // Subscription endpoints

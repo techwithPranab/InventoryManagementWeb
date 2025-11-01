@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import AdminHeader from '@/components/Admin/AdminHeader';
 import AdminFooter from '@/components/Admin/AdminFooter';
 import AdminSidebar from '@/components/Admin/AdminSidebar';
 import { Menu as MenuIcon } from '@mui/icons-material';
@@ -73,35 +74,40 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-      {/* Sidebar */}
-      <AdminSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+    <div className="min-h-screen bg-slate-50">
+      {/* Admin Header */}
+      <AdminHeader />
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Header with mobile menu button */}
-        <div className="bg-white shadow-sm border-b border-slate-200">
-          <div className="flex items-center justify-between px-4 py-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-slate-600 hover:text-slate-900"
-              aria-label="Open sidebar"
-            >
-              <MenuIcon className="h-6 w-6" />
-            </button>
-            <div className="lg:hidden">
-              <h1 className="text-lg font-semibold text-slate-900">Admin Portal</h1>
+      <div className="flex">
+        {/* Sidebar */}
+        <AdminSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+
+        {/* Main content */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Mobile header for sidebar toggle */}
+          <div className="lg:hidden bg-white shadow-sm border-b border-slate-200">
+            <div className="flex items-center justify-between px-4 py-3">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="text-slate-600 hover:text-slate-900"
+                aria-label="Open sidebar"
+              >
+                <MenuIcon className="h-6 w-6" />
+              </button>
+              <div>
+                <h1 className="text-lg font-semibold text-slate-900">Admin Portal</h1>
+              </div>
+              <div className="w-6" /> {/* Spacer for centering */}
             </div>
-            <div className="lg:hidden w-6" /> {/* Spacer for centering */}
           </div>
+
+          {/* Page content */}
+          <main className="flex-1 overflow-auto">
+            {children}
+          </main>
+
+          <AdminFooter />
         </div>
-
-        {/* Page content */}
-        <main className="flex-1 overflow-auto">
-          {children}
-        </main>
-
-        <AdminFooter />
       </div>
     </div>
   );

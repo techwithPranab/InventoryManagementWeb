@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
+import { createInventorySetup } from '@/lib/inventorySetupService';
 import jwt from 'jsonwebtoken';
 
 interface RouteContext {
@@ -124,6 +125,32 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       updateData,
       { new: true }
     ).select('-password').populate('approvedBy', 'name email');
+    console.log(updatedUser);
+    // If user is approved, create inventory setup and client database
+    if (action === 'approve' && updatedUser) {
+      try {
+        const inventorySetup = await createInventorySetup(updatedUser, authUser.userId);
+        console.log('Inventory setup created successfully:', inventorySetup.clientCode);
+        
+        return NextResponse.json({
+          message: `User ${action}d successfully and inventory setup created`,
+          user: updatedUser,
+          inventorySetup: {
+            clientCode: inventorySetup.clientCode,
+            databaseName: inventorySetup.databaseName,
+            setupStatus: inventorySetup.setupStatus
+          }
+        });
+      } catch (setupError) {
+        console.error('Error creating inventory setup:', setupError);
+        // Return success for user approval but note the setup error
+        return NextResponse.json({
+          message: `User ${action}d successfully but inventory setup failed`,
+          user: updatedUser,
+          warning: 'Inventory setup could not be created automatically. Please create manually.'
+        });
+      }
+    }
 
     return NextResponse.json({
       message: `User ${action}d successfully`,

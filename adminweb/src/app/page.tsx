@@ -73,6 +73,151 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Customer Reviews Section */}
+        <div className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">What Our Customers Say</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Don't just take our word for it. Here's what businesses are saying about our inventory management system.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <div className="flex items-center mb-4">
+                  <div className="flex text-yellow-400">
+                    {'★'.repeat(5)}
+                  </div>
+                </div>
+                <p className="text-gray-700 mb-4 italic">
+                  "Inventory Pro has transformed our warehouse operations. We've reduced stockouts by 60%
+                  and improved our inventory accuracy to 99.5%. The real-time analytics are game-changing."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-blue-600 font-semibold">SJ</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Sarah Johnson</p>
+                    <p className="text-sm text-gray-600">Operations Manager, TechCorp</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <div className="flex items-center mb-4">
+                  <div className="flex text-yellow-400">
+                    {'★'.repeat(5)}
+                  </div>
+                </div>
+                <p className="text-gray-700 mb-4 italic">
+                  "The ease of use and comprehensive features make Inventory Pro perfect for our growing business.
+                  Customer support is exceptional, and the mobile app keeps us connected on the go."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-green-600 font-semibold">MC</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Michael Chen</p>
+                    <p className="text-sm text-gray-600">CEO, RetailPlus</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <div className="flex items-center mb-4">
+                  <div className="flex text-yellow-400">
+                    {'★'.repeat(5)}
+                  </div>
+                </div>
+                <p className="text-gray-700 mb-4 italic">
+                  "Since implementing Inventory Pro, our supply chain efficiency has improved dramatically.
+                  The automated reorder system and detailed reporting have saved us countless hours."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-purple-600 font-semibold">ER</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Emily Rodriguez</p>
+                    <p className="text-sm text-gray-600">Supply Chain Director, GlobalTrade</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Trusted Partners Section */}
+        <div className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Trusted by Industry Leaders</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Join thousands of businesses worldwide that trust Inventory Pro for their inventory management needs.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center">
+              <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-2xl">🏢</span>
+                  </div>
+                  <p className="font-semibold text-gray-900 text-sm">TechCorp</p>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-2xl">🏪</span>
+                  </div>
+                  <p className="font-semibold text-gray-900 text-sm">RetailPlus</p>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-2xl">🌍</span>
+                  </div>
+                  <p className="font-semibold text-gray-900 text-sm">GlobalTrade</p>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-2xl">🏭</span>
+                  </div>
+                  <p className="font-semibold text-gray-900 text-sm">Manufacturing Inc</p>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-2xl">📦</span>
+                  </div>
+                  <p className="font-semibold text-gray-900 text-sm">Logistics Pro</p>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-2xl">🛒</span>
+                  </div>
+                  <p className="font-semibold text-gray-900 text-sm">E-Commerce Hub</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Call to Action */}
         <div className="bg-blue-600 text-white rounded-lg p-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to get started?</h2>

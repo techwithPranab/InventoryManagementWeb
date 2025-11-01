@@ -19,7 +19,6 @@ const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
 const pricingRoutes = require('./routes/pricing');
 const contactRoutes = require('./routes/contacts');
-const supportTicketRoutes = require('./routes/supportTickets');
 
 // Load environment variables
 dotenv.config();
@@ -54,8 +53,6 @@ app.use('/api/shipping', shippingRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/contacts', contactRoutes);
-app.use('/api/support-tickets', supportTicketRoutes);
-app.use('/api/admin/support-tickets', supportTicketRoutes);
 app.use('/api/pricing', pricingRoutes);
 
 // Health check route

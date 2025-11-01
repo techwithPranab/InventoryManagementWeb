@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function AdminHeader() {
@@ -30,16 +29,6 @@ export default function AdminHeader() {
               <p className="text-xs text-slate-300">Inventory Management System</p>
             </div>
           </div>
-
-          {/* Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            <Link
-              href="/admin"
-              className="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 hover:bg-slate-700"
-            >
-              Dashboard
-            </Link>
-          </nav>
 
           {/* User Menu */}
           <div className="flex items-center space-x-4">

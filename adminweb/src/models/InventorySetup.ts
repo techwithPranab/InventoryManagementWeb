@@ -63,13 +63,6 @@ const InventorySetupSchema = new mongoose.Schema({
     initialInventorySet: { type: Boolean, default: false }
   },
 
-  // Setup Data (for reference)
-  setupData: {
-    categories: [{ type: mongoose.Schema.Types.Mixed }],
-    warehouses: [{ type: mongoose.Schema.Types.Mixed }],
-    products: [{ type: mongoose.Schema.Types.Mixed }]
-  },
-
   // Admin who performed the setup
   setupBy: {
     type: mongoose.Schema.Types.ObjectId,
