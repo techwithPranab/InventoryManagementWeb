@@ -1,67 +1,85 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
+interface SubscriptionPlan {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+  billingCycle: 'monthly' | 'yearly';
+  features: string[];
+  maxProducts: number;
+  maxWarehouses: number;
+  maxUsers: number;
+}
+
 export default function Pricing() {
-  const plans = [
-    {
-      name: 'Starter',
-      price: '$29',
-      period: '/month',
-      description: 'Perfect for small businesses just getting started',
-      features: [
-        'Up to 1,000 products',
-        '1 warehouse location',
-        'Basic reporting',
-        'Email support',
-        'Mobile app access',
-        'Standard integrations'
-      ],
-      buttonText: 'Start Free Trial',
-      buttonStyle: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
-      popular: false
-    },
-    {
-      name: 'Professional',
-      price: '$79',
-      period: '/month',
-      description: 'Ideal for growing businesses with advanced needs',
-      features: [
-        'Up to 10,000 products',
-        '5 warehouse locations',
-        'Advanced analytics',
-        'Priority support',
-        'Mobile app access',
-        'All integrations',
-        'Custom workflows',
-        'API access'
-      ],
-      buttonText: 'Start Free Trial',
-      buttonStyle: 'bg-blue-600 text-white hover:bg-blue-700',
-      popular: true
-    },
-    {
-      name: 'Enterprise',
-      price: '$199',
-      period: '/month',
-      description: 'For large organizations with complex requirements',
-      features: [
-        'Unlimited products',
-        'Unlimited warehouses',
-        'Custom reporting',
-        '24/7 phone support',
-        'Mobile app access',
-        'All integrations',
-        'Custom workflows',
-        'Full API access',
-        'Dedicated account manager',
-        'Custom training'
-      ],
-      buttonText: 'Contact Sales',
-      buttonStyle: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
-      popular: false
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
+  const fetchPlans = async () => {
+    try {
+      const response = await fetch('/api/subscriptions');
+      if (response.ok) {
+        const data = await response.json();
+        setPlans(data.plans);
+      } else {
+        setError('Failed to load pricing plans');
+      }
+    } catch (err) {
+      console.error('Error fetching plans:', err);
+      setError('Failed to load pricing plans');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const formatPlanData = (plan: SubscriptionPlan) => {
+    const features = [
+      `Up to ${plan.maxProducts.toLocaleString()} products`,
+      `${plan.maxWarehouses} warehouse location${plan.maxWarehouses > 1 ? 's' : ''}`,
+      `${plan.maxUsers} user${plan.maxUsers > 1 ? 's' : ''}`,
+      ...plan.features
+    ];
+
+    const isFree = plan.price === 0;
+    const isEnterprise = plan.name.toLowerCase().includes('enterprise');
+    const isProfessional = plan.name.toLowerCase().includes('professional');
+
+    let buttonText: string;
+    let buttonStyle: string;
+
+    if (isEnterprise) {
+      buttonText = 'Contact Sales';
+      buttonStyle = 'bg-gray-100 text-gray-900 hover:bg-gray-200';
+    } else if (isFree) {
+      buttonText = 'Get Started';
+      buttonStyle = 'bg-green-600 text-white hover:bg-green-700';
+    } else {
+      buttonText = 'Start Free Trial';
+      buttonStyle = isProfessional ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-100 text-gray-900 hover:bg-gray-200';
+    }
+
+    return {
+      ...plan,
+      price: isFree ? 'Free' : `$${plan.price}`,
+      period: isFree ? '' : `/${plan.billingCycle}`,
+      features,
+      buttonText,
+      buttonStyle,
+      popular: isProfessional
+    };
+  };
 
   const faqs = [
     {
@@ -85,6 +103,33 @@ export default function Pricing() {
       answer: 'Yes, we offer a 20% discount when you pay annually instead of monthly.'
     }
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Error Loading Pricing</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={fetchPlans}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const formattedPlans = plans.map(formatPlanData);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -120,8 +165,8 @@ export default function Pricing() {
         <div className="py-20">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {plans.map((plan, index) => (
-                <div key={index} className={`bg-white rounded-lg shadow-lg overflow-hidden ${plan.popular ? 'ring-2 ring-blue-500 transform scale-105' : ''}`}>
+              {formattedPlans.map((plan) => (
+                <div key={plan._id} className={`bg-white rounded-lg shadow-lg overflow-hidden ${plan.popular ? 'ring-2 ring-blue-500 transform scale-105' : ''}`}>
                   {plan.popular && (
                     <div className="bg-blue-500 text-white text-center py-2 font-semibold">
                       Most Popular
@@ -136,7 +181,7 @@ export default function Pricing() {
                     </div>
                     <ul className="space-y-3 mb-8">
                       {plan.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-center">
+                        <li key={`${plan._id}-feature-${idx}`} className="flex items-center">
                           <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
@@ -216,8 +261,8 @@ export default function Pricing() {
             </div>
             
             <div className="max-w-3xl mx-auto space-y-6">
-              {faqs.map((faq, index) => (
-                <div key={index} className="bg-white rounded-lg p-6 shadow-sm">
+              {faqs.map((faq) => (
+                <div key={faq.question} className="bg-white rounded-lg p-6 shadow-sm">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">{faq.question}</h3>
                   <p className="text-gray-600">{faq.answer}</p>
                 </div>

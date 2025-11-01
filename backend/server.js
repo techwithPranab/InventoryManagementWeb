@@ -17,6 +17,7 @@ const supplierRoutes = require('./routes/suppliers');
 const shippingRoutes = require('./routes/shipping');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
+const pricingRoutes = require('./routes/pricing');
 
 // Load environment variables
 dotenv.config();
@@ -50,6 +51,7 @@ app.use('/api/suppliers', supplierRoutes);
 app.use('/api/shipping', shippingRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/pricing', pricingRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

@@ -28,11 +28,6 @@ export default function AdminFooter() {
                 </a>
               </li>
               <li>
-                <a href="/admin/inventory-setup" className="text-slate-300 hover:text-white text-sm transition-colors duration-200">
-                  Inventory Setup
-                </a>
-              </li>
-              <li>
                 <a href="/login" className="text-slate-300 hover:text-white text-sm transition-colors duration-200">
                   User Portal
                 </a>

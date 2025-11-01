@@ -29,21 +29,16 @@ export const api = {
   admin: {
     users: (params?: string) => params ? `/api/admin/users?${params}` : '/api/admin/users',
     userById: (userId: string) => `/api/admin/users/${userId}`,
-    updateInventorySetup: (userId: string) => `/api/admin/users/${userId}/inventory-setup`,
     dashboard: '/api/admin/dashboard'
   },
 
   // Backend APIs (external, use buildUrl)
   backend: {
-    inventorySetup: '/api/admin/inventory-setup',
-    inventoryStatus: (userId: string) => `/api/admin/inventory-setup/${userId}`,
+    // Inventory setup is handled by the backend service
   },
 
-  // Other endpoints can be added here
-  categories: '/api/categories',
-  products: '/api/products',
-  warehouses: '/api/warehouses',
-  inventory: '/api/inventory'
+  // Subscription endpoints
+  subscriptions: '/api/subscriptions'
 };
 
 export default api;

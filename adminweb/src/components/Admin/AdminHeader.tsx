@@ -39,12 +39,6 @@ export default function AdminHeader() {
             >
               Dashboard
             </Link>
-            <Link
-              href="/admin/inventory-setup"
-              className="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 hover:bg-slate-700"
-            >
-              Inventory Setup
-            </Link>
           </nav>
 
           {/* User Menu */}
