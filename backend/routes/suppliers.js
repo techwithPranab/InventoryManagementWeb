@@ -1,12 +1,12 @@
 const express = require('express');
-const Supplier = require('../models/Supplier');
-const { auth, authorize } = require('../middleware/auth');
+const { auth, authorize, requireClientCode } = require('../middleware/auth');
 
 const router = express.Router();
 
 // Get all suppliers
-router.get('/', auth, async (req, res) => {
+router.get('/', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Supplier } = req.models;
     const suppliers = await Supplier.find().sort({ name: 1 });
     res.json(suppliers);
   } catch (err) {
@@ -15,8 +15,9 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Get supplier by ID
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Supplier } = req.models;
     const supplier = await Supplier.findById(req.params.id);
     if (!supplier) return res.status(404).json({ message: 'Not found' });
     res.json(supplier);
@@ -26,8 +27,9 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // Create supplier
-router.post('/', [auth, authorize('admin', 'manager')], async (req, res) => {
+router.post('/', [auth, requireClientCode, authorize('admin', 'manager', 'staff')], async (req, res) => {
   try {
+    const { Supplier } = req.models;
     const supplier = new Supplier(req.body);
     await supplier.save();
     res.status(201).json(supplier);
@@ -37,8 +39,9 @@ router.post('/', [auth, authorize('admin', 'manager')], async (req, res) => {
 });
 
 // Update supplier
-router.put('/:id', [auth, authorize('admin', 'manager')], async (req, res) => {
+router.put('/:id', [auth, requireClientCode, authorize('admin', 'manager', 'staff')], async (req, res) => {
   try {
+    const { Supplier } = req.models;
     const supplier = await Supplier.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!supplier) return res.status(404).json({ message: 'Not found' });
     res.json(supplier);
@@ -48,8 +51,9 @@ router.put('/:id', [auth, authorize('admin', 'manager')], async (req, res) => {
 });
 
 // Delete supplier
-router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
+router.delete('/:id', [auth, requireClientCode, authorize('admin')], async (req, res) => {
   try {
+    const { Supplier } = req.models;
     const supplier = await Supplier.findByIdAndDelete(req.params.id);
     if (!supplier) return res.status(404).json({ message: 'Not found' });
     res.json({ message: 'Deleted' });

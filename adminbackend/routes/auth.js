@@ -9,8 +9,13 @@ const { authLimiter } = require('../middleware/rateLimiter');
 const router = express.Router();
 
 // Generate JWT Token
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+const generateToken = (user) => {
+  return jwt.sign({ 
+    id: user._id,
+    userId: user._id,
+    role: user.role,
+    email: user.email
+  }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE || '30d',
   });
 };
@@ -70,7 +75,7 @@ router.post('/register', [
     });
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     res.status(201).json({
       success: true,
@@ -162,7 +167,7 @@ router.post('/login', [
     }
     console.log('Login attempt - Client Code:', clientCode);
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     res.json({
       success: true,

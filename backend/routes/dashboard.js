@@ -1,19 +1,15 @@
 const express = require('express');
-const Product = require('../models/Product');
-const Category = require('../models/Category');
-const Warehouse = require('../models/Warehouse');
-const Inventory = require('../models/Inventory');
-const PurchaseOrder = require('../models/PurchaseOrder');
-const SalesOrder = require('../models/SalesOrder');
-const { auth } = require('../middleware/auth');
+const { auth, requireClientCode } = require('../middleware/auth');
 
 const router = express.Router();
 
 // @route   GET /api/dashboard/overview
 // @desc    Get dashboard overview statistics
 // @access  Private
-router.get('/overview', auth, async (req, res) => {
+router.get('/overview', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Product, Category, Warehouse, Inventory, PurchaseOrder, SalesOrder } = req.models;
+
     // Get basic counts
     const [
       totalProducts,
@@ -104,8 +100,9 @@ router.get('/overview', auth, async (req, res) => {
 // @route   GET /api/dashboard/recent-activities
 // @desc    Get recent activities
 // @access  Private
-router.get('/recent-activities', auth, async (req, res) => {
+router.get('/recent-activities', [auth, requireClientCode], async (req, res) => {
   try {
+    const { PurchaseOrder, SalesOrder } = req.models;
     const limit = parseInt(req.query.limit) || 10;
 
     const [recentPurchases, recentSales] = await Promise.all([
@@ -162,8 +159,10 @@ router.get('/recent-activities', auth, async (req, res) => {
 // @route   GET /api/dashboard/inventory-alerts
 // @desc    Get inventory alerts (low stock, out of stock)
 // @access  Private
-router.get('/inventory-alerts', auth, async (req, res) => {
+router.get('/inventory-alerts', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Inventory } = req.models;
+    
     const lowStockProducts = await Inventory.aggregate([
       {
         $lookup: {
@@ -236,8 +235,9 @@ router.get('/inventory-alerts', auth, async (req, res) => {
 // @route   GET /api/dashboard/top-products
 // @desc    Get top selling products
 // @access  Private
-router.get('/top-products', auth, async (req, res) => {
+router.get('/top-products', [auth, requireClientCode], async (req, res) => {
   try {
+    const { SalesOrder } = req.models;
     const { period = '30' } = req.query;
     const days = parseInt(period);
     const startDate = new Date();
@@ -294,8 +294,9 @@ router.get('/top-products', auth, async (req, res) => {
 // @route   GET /api/dashboard/sales-chart
 // @desc    Get sales data for chart
 // @access  Private
-router.get('/sales-chart', auth, async (req, res) => {
+router.get('/sales-chart', [auth, requireClientCode], async (req, res) => {
   try {
+    const { SalesOrder, PurchaseOrder } = req.models;
     const { period = 'month' } = req.query;
     let groupBy, startDate;
 
@@ -376,8 +377,10 @@ router.get('/sales-chart', auth, async (req, res) => {
 // @route   GET /api/dashboard/warehouse-summary
 // @desc    Get warehouse summary
 // @access  Private
-router.get('/warehouse-summary', auth, async (req, res) => {
+router.get('/warehouse-summary', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Warehouse } = req.models;
+    
     const warehouseSummary = await Warehouse.aggregate([
       { $match: { isActive: true } },
       {

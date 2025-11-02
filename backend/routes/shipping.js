@@ -1,12 +1,11 @@
 const express = require('express');
-const Shipping = require('../models/Shipping');
-const SalesOrder = require('../models/SalesOrder');
-const { auth, authorize } = require('../middleware/auth');
+const { auth, authorize, requireClientCode } = require('../middleware/auth');
 const router = express.Router();
 
 // Create shipping record
-router.post('/', [auth, authorize('admin', 'manager')], async (req, res) => {
+router.post('/', [auth, requireClientCode, authorize('admin', 'manager')], async (req, res) => {
   try {
+    const { Shipping } = req.models;
     const shipping = new Shipping(req.body);
     await shipping.save();
     res.status(201).json(shipping);
@@ -16,8 +15,9 @@ router.post('/', [auth, authorize('admin', 'manager')], async (req, res) => {
 });
 
 // Get all shipping records
-router.get('/', auth, async (req, res) => {
+router.get('/', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Shipping } = req.models;
     const shippings = await Shipping.find().populate('order', 'orderNumber');
     res.json(shippings);
   } catch (err) {
@@ -26,8 +26,9 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Get shipping by ID
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Shipping } = req.models;
     const shipping = await Shipping.findById(req.params.id).populate('order', 'orderNumber');
     if (!shipping) return res.status(404).json({ message: 'Shipping record not found' });
     res.json(shipping);
@@ -37,8 +38,9 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // Update shipping record
-router.put('/:id', [auth, authorize('admin', 'manager')], async (req, res) => {
+router.put('/:id', [auth, requireClientCode, authorize('admin', 'manager')], async (req, res) => {
   try {
+    const { Shipping } = req.models;
     const shipping = await Shipping.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!shipping) return res.status(404).json({ message: 'Shipping record not found' });
     res.json(shipping);
@@ -48,8 +50,9 @@ router.put('/:id', [auth, authorize('admin', 'manager')], async (req, res) => {
 });
 
 // Delete shipping record
-router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
+router.delete('/:id', [auth, requireClientCode, authorize('admin')], async (req, res) => {
   try {
+    const { Shipping } = req.models;
     const shipping = await Shipping.findByIdAndDelete(req.params.id);
     if (!shipping) return res.status(404).json({ message: 'Shipping record not found' });
     res.json({ message: 'Shipping record deleted' });
@@ -59,8 +62,9 @@ router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
 });
 
 // Update shipping status (shipped, in_transit, delivered, cancelled)
-router.post('/:id/status', [auth, authorize('admin', 'manager')], async (req, res) => {
+router.post('/:id/status', [auth, requireClientCode, authorize('admin', 'manager')], async (req, res) => {
   try {
+    const { Shipping } = req.models;
     const { status, shippedDate, deliveredDate, estimatedDelivery } = req.body;
     const shipping = await Shipping.findById(req.params.id);
     if (!shipping) return res.status(404).json({ message: 'Shipping record not found' });

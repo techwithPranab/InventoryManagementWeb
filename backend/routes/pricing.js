@@ -1,15 +1,15 @@
 const express = require('express');
-const Product = require('../models/Product');
-const SalesOrder = require('../models/SalesOrder');
-const { auth } = require('../middleware/auth');
+const { auth, requireClientCode } = require('../middleware/auth');
 
 const router = express.Router();
 
 // @route   GET /api/pricing/overview
 // @desc    Get pricing overview and analytics
 // @access  Private
-router.get('/overview', auth, async (req, res) => {
+router.get('/overview', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Product } = req.models;
+    
     // Get pricing statistics
     const pricingStats = await Product.aggregate([
       { $match: { isActive: true } },
@@ -125,8 +125,9 @@ router.get('/overview', auth, async (req, res) => {
 // @route   GET /api/pricing/products
 // @desc    Get product pricing details
 // @access  Private
-router.get('/products', auth, async (req, res) => {
+router.get('/products', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Product } = req.models;
     const {
       page = 1,
       limit = 10,
@@ -225,8 +226,10 @@ router.get('/products', auth, async (req, res) => {
 // @route   GET /api/pricing/categories
 // @desc    Get pricing by categories
 // @access  Private
-router.get('/categories', auth, async (req, res) => {
+router.get('/categories', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Product } = req.models;
+    
     const categoryPricing = await Product.aggregate([
       { $match: { isActive: true } },
       {
@@ -280,8 +283,9 @@ router.get('/categories', auth, async (req, res) => {
 // @route   GET /api/pricing/trends
 // @desc    Get pricing trends over time
 // @access  Private
-router.get('/trends', auth, async (req, res) => {
+router.get('/trends', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Product } = req.models;
     const { period = 'month' } = req.query;
     let groupBy, startDate;
 
@@ -361,8 +365,10 @@ router.get('/trends', auth, async (req, res) => {
 // @route   GET /api/pricing/product/:id
 // @desc    Get detailed pricing for a specific product
 // @access  Private
-router.get('/product/:id', auth, async (req, res) => {
+router.get('/product/:id', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Product, SalesOrder } = req.models;
+    
     const product = await Product.findById(req.params.id)
       .populate('category', 'name');
 

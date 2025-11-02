@@ -1,19 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { body, validationResult } = require('express-validator');
-const Inventory = require('../models/Inventory');
-const Product = require('../models/Product');
-const Warehouse = require('../models/Warehouse');
-const InventoryTransfer = require('../models/InventoryTransfer');
-const { auth, authorize } = require('../middleware/auth');
+const { auth, authorize, requireClientCode } = require('../middleware/auth');
 
 const router = express.Router();
 
 // @route   GET /api/inventory
 // @desc    Get consolidated inventory across all warehouses
 // @access  Private
-router.get('/', auth, async (req, res) => {
+router.get('/', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Inventory } = req.models;
     const { 
       page = 1, 
       limit = 10, 
@@ -162,8 +159,9 @@ router.get('/', auth, async (req, res) => {
 // @route   GET /api/inventory/summary
 // @desc    Get inventory summary statistics
 // @access  Private
-router.get('/summary', auth, async (req, res) => {
+router.get('/summary', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Inventory } = req.models;
     const { warehouse } = req.query;
     let matchStage = {};
     
@@ -289,8 +287,9 @@ router.get('/summary', auth, async (req, res) => {
 // @route   GET /api/inventory/alerts
 // @desc    Get inventory alerts (low stock, out of stock, overstock)
 // @access  Private
-router.get('/alerts', auth, async (req, res) => {
+router.get('/alerts', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Inventory } = req.models;
     const { warehouse, severity = 'all' } = req.query;
     let matchStage = {};
     
@@ -391,6 +390,7 @@ router.get('/alerts', auth, async (req, res) => {
 // @access  Private (Admin/Manager)
 router.post('/adjustment', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('warehouse').notEmpty().withMessage('Warehouse is required'),
   body('product').notEmpty().withMessage('Product is required'),
@@ -399,6 +399,7 @@ router.post('/adjustment', [
   body('reason').isIn(['recount', 'damage', 'theft', 'expiry', 'found', 'correction', 'other']).withMessage('Invalid reason')
 ], async (req, res) => {
   try {
+    const { Inventory, Product, Warehouse } = req.models;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -502,8 +503,9 @@ router.post('/adjustment', [
 // @route   GET /api/inventory/movements
 // @desc    Get inventory movement history
 // @access  Private
-router.get('/movements', auth, async (req, res) => {
+router.get('/movements', [auth, requireClientCode], async (req, res) => {
   try {
+    const { InventoryTransfer } = req.models;
     const { 
       page = 1, 
       limit = 10, 
@@ -607,8 +609,9 @@ router.get('/movements', auth, async (req, res) => {
 // @route   GET /api/inventory/valuation
 // @desc    Get inventory valuation report
 // @access  Private
-router.get('/valuation', auth, async (req, res) => {
+router.get('/valuation', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Inventory } = req.models;
     const { warehouse, category, method = 'cost' } = req.query; // method: 'cost' or 'selling'
     
     let matchStage = {};
@@ -737,6 +740,7 @@ router.get('/valuation', auth, async (req, res) => {
 // @access  Private (Admin/Manager)
 router.post('/bulk-update', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('updates').isArray({ min: 1 }).withMessage('Updates array is required'),
   body('updates.*.warehouse').notEmpty().withMessage('Warehouse is required for each update'),
@@ -744,6 +748,7 @@ router.post('/bulk-update', [
   body('updates.*.quantity').isNumeric().withMessage('Quantity must be a number for each update')
 ], async (req, res) => {
   try {
+    const { Inventory } = req.models;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 

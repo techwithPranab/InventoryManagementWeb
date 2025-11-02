@@ -4,19 +4,16 @@
 
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const PurchaseOrder = require('../models/PurchaseOrder');
-const Product = require('../models/Product');
-const Warehouse = require('../models/Warehouse');
-const Inventory = require('../models/Inventory');
-const { auth, authorize } = require('../middleware/auth');
+const { auth, authorize, requireClientCode } = require('../middleware/auth');
 
 const router = express.Router();
 
 // @route   GET /api/purchases
 // @desc    Get all purchase orders
 // @access  Private
-router.get('/', auth, async (req, res) => {
+router.get('/', [auth, requireClientCode], async (req, res) => {
   try {
+    const { PurchaseOrder } = req.models;
     const { 
       page = 1, 
       limit = 10, 
@@ -80,8 +77,9 @@ router.get('/', auth, async (req, res) => {
 // @route   GET /api/purchases/metrics
 // @desc    Get purchase order metrics and analytics
 // @access  Private
-router.get('/metrics', auth, async (req, res) => {
+router.get('/metrics', [auth, requireClientCode], async (req, res) => {
   try {
+    const { PurchaseOrder } = req.models;
     const { period = '30' } = req.query;
     const days = parseInt(period);
     const startDate = new Date();
@@ -202,8 +200,9 @@ router.get('/metrics', auth, async (req, res) => {
 // @route   GET /api/purchases/:id
 // @desc    Get purchase order by ID
 // @access  Private
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', [auth, requireClientCode], async (req, res) => {
   try {
+    const { PurchaseOrder } = req.models;
     const purchaseOrder = await PurchaseOrder.findById(req.params.id)
       .populate('supplier', 'name email phone address')
       .populate('warehouse', 'name code address')
@@ -229,6 +228,7 @@ router.get('/:id', auth, async (req, res) => {
 // @access  Private (Admin/Manager)
 router.post('/', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('supplier').notEmpty().withMessage('Supplier is required'),
   body('warehouse').notEmpty().withMessage('Warehouse is required'),
@@ -238,6 +238,7 @@ router.post('/', [
   body('items.*.unitPrice').isFloat({ min: 0 }).withMessage('Unit price must be positive')
 ], async (req, res) => {
   try {
+    const { PurchaseOrder, Product } = req.models;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -343,11 +344,13 @@ router.post('/', [
 // @access  Private (Admin/Manager)
 router.put('/:id', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('supplier').optional().notEmpty().withMessage('Supplier cannot be empty'),
   body('status').optional().isIn(['draft', 'sent', 'confirmed', 'partial', 'received', 'cancelled']).withMessage('Invalid status')
 ], async (req, res) => {
   try {
+    const { PurchaseOrder } = req.models;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -412,12 +415,14 @@ router.put('/:id', [
 // @access  Private (Admin/Manager)
 router.post('/:id/receive', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('items').isArray({ min: 1 }).withMessage('Items are required'),
   body('items.*.product').notEmpty().withMessage('Product ID is required'),
   body('items.*.receivedQuantity').isInt({ min: 0 }).withMessage('Received quantity must be non-negative')
 ], async (req, res) => {
   try {
+    const { PurchaseOrder, Inventory } = req.models;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -513,8 +518,9 @@ router.post('/:id/receive', [
 // @route   DELETE /api/purchases/:id
 // @desc    Delete purchase order
 // @access  Private (Admin)
-router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
+router.delete('/:id', [auth, requireClientCode, authorize('admin')], async (req, res) => {
   try {
+    const { PurchaseOrder } = req.models;
     const purchaseOrder = await PurchaseOrder.findById(req.params.id);
 
     if (!purchaseOrder) {
@@ -543,8 +549,9 @@ router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
 // @route   GET /api/purchases/reports/summary
 // @desc    Get purchase summary report
 // @access  Private
-router.get('/reports/summary', auth, async (req, res) => {
+router.get('/reports/summary', [auth, requireClientCode], async (req, res) => {
   try {
+    const { PurchaseOrder } = req.models;
     const { startDate, endDate, warehouse } = req.query;
     const matchStage = {};
 
@@ -598,8 +605,9 @@ router.get('/reports/summary', auth, async (req, res) => {
 // @route   POST /api/purchases/:id/submit-for-approval
 // @desc    Submit purchase order for approval
 // @access  Private (Admin/Manager)
-router.post('/:id/submit-for-approval', [auth, authorize('admin', 'manager')], async (req, res) => {
+router.post('/:id/submit-for-approval', [auth, requireClientCode, authorize('admin', 'manager')], async (req, res) => {
   try {
+    const { PurchaseOrder } = req.models;
     const purchaseOrder = await PurchaseOrder.findById(req.params.id);
     if (!purchaseOrder) {
       return res.status(404).json({ message: 'Purchase order not found' });
@@ -640,8 +648,9 @@ router.post('/:id/submit-for-approval', [auth, authorize('admin', 'manager')], a
 // @route   POST /api/purchases/:id/approve
 // @desc    Approve purchase order
 // @access  Private (Admin only)
-router.post('/:id/approve', [auth, authorize('admin')], async (req, res) => {
+router.post('/:id/approve', [auth, requireClientCode, authorize('admin')], async (req, res) => {
   try {
+    const { PurchaseOrder } = req.models;
     const purchaseOrder = await PurchaseOrder.findById(req.params.id);
     if (!purchaseOrder) {
       return res.status(404).json({ message: 'Purchase order not found' });
@@ -680,10 +689,12 @@ router.post('/:id/approve', [auth, authorize('admin')], async (req, res) => {
 // @access  Private (Admin only)
 router.post('/:id/reject', [
   auth,
+  requireClientCode,
   authorize('admin'),
   body('reason').trim().notEmpty().withMessage('Rejection reason is required')
 ], async (req, res) => {
   try {
+    const { PurchaseOrder } = req.models;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -721,129 +732,6 @@ router.post('/:id/reject', [
     res.json({
       message: 'Purchase order rejected',
       purchaseOrder
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// @route   GET /api/purchases/metrics
-// @desc    Get purchase order metrics and analytics
-// @access  Private
-router.get('/metrics', auth, async (req, res) => {
-  try {
-    const { period = '30' } = req.query;
-    const days = parseInt(period);
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
-
-    // Get total counts by status
-    const statusCounts = await PurchaseOrder.aggregate([
-      {
-        $group: {
-          _id: '$status',
-          count: { $sum: 1 },
-          totalAmount: { $sum: '$totalAmount' }
-        }
-      }
-    ]);
-
-    // Get approval metrics
-    const approvalMetrics = await PurchaseOrder.aggregate([
-      {
-        $group: {
-          _id: '$approvalStatus',
-          count: { $sum: 1 },
-          totalAmount: { $sum: '$totalAmount' }
-        }
-      }
-    ]);
-
-    // Get period-specific metrics
-    const periodMetrics = await PurchaseOrder.aggregate([
-      { $match: { orderDate: { $gte: startDate } } },
-      {
-        $group: {
-          _id: null,
-          totalOrders: { $sum: 1 },
-          totalAmount: { $sum: '$totalAmount' },
-          avgOrderValue: { $avg: '$totalAmount' },
-          pendingApproval: {
-            $sum: { $cond: [{ $eq: ['$status', 'pending_approval'] }, 1, 0] }
-          },
-          approved: {
-            $sum: { $cond: [{ $eq: ['$status', 'approved'] }, 1, 0] }
-          },
-          received: {
-            $sum: { $cond: [{ $eq: ['$status', 'received'] }, 1, 0] }
-          }
-        }
-      }
-    ]);
-
-    // Get top suppliers by order count
-    const topSuppliers = await PurchaseOrder.aggregate([
-      { $match: { orderDate: { $gte: startDate } } },
-      {
-        $group: {
-          _id: '$supplier',
-          orderCount: { $sum: 1 },
-          totalAmount: { $sum: '$totalAmount' }
-        }
-      },
-      {
-        $lookup: {
-          from: 'suppliers',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'supplierInfo'
-        }
-      },
-      { $unwind: '$supplierInfo' },
-      {
-        $project: {
-          supplier: '$supplierInfo.name',
-          orderCount: 1,
-          totalAmount: 1
-        }
-      },
-      { $sort: { orderCount: -1 } },
-      { $limit: 5 }
-    ]);
-
-    // Get priority breakdown
-    const priorityBreakdown = await PurchaseOrder.aggregate([
-      { $match: { orderDate: { $gte: startDate } } },
-      {
-        $group: {
-          _id: '$priority',
-          count: { $sum: 1 },
-          totalAmount: { $sum: '$totalAmount' }
-        }
-      }
-    ]);
-
-    const totalOrders = await PurchaseOrder.countDocuments();
-    const result = periodMetrics[0] || {
-      totalOrders: 0,
-      totalAmount: 0,
-      avgOrderValue: 0,
-      pendingApproval: 0,
-      approved: 0,
-      received: 0
-    };
-
-    res.json({
-      overview: {
-        ...result,
-        totalOrders
-      },
-      statusCounts,
-      approvalMetrics,
-      topSuppliers,
-      priorityBreakdown,
-      period: `${days} days`
     });
   } catch (error) {
     console.error(error);

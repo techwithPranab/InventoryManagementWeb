@@ -1,18 +1,15 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const SalesOrder = require('../models/SalesOrder');
-const Product = require('../models/Product');
-const Warehouse = require('../models/Warehouse');
-const Inventory = require('../models/Inventory');
-const { auth, authorize } = require('../middleware/auth');
+const { auth, authorize, requireClientCode } = require('../middleware/auth');
 
 const router = express.Router();
 
 // @route   GET /api/sales
 // @desc    Get all sales orders
 // @access  Private
-router.get('/', auth, async (req, res) => {
+router.get('/', [auth, requireClientCode], async (req, res) => {
   try {
+    const { SalesOrder } = req.models;
     const { 
       page = 1, 
       limit = 10, 
@@ -76,8 +73,9 @@ router.get('/', auth, async (req, res) => {
 // @route   GET /api/sales/:id
 // @desc    Get sales order by ID
 // @access  Private
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', [auth, requireClientCode], async (req, res) => {
   try {
+    const { SalesOrder } = req.models;
     const salesOrder = await SalesOrder.findById(req.params.id)
       .populate('warehouse', 'name code address')
       .populate('items.product', 'name sku unit sellingPrice')
@@ -102,6 +100,7 @@ router.get('/:id', auth, async (req, res) => {
 // @access  Private (Admin/Manager/Staff)
 router.post('/', [
   auth,
+  requireClientCode,
   body('customer.name').trim().notEmpty().withMessage('Customer name is required'),
   body('warehouse').notEmpty().withMessage('Warehouse is required'),
   body('items').isArray({ min: 1 }).withMessage('At least one item is required'),
@@ -110,6 +109,7 @@ router.post('/', [
   body('items.*.unitPrice').isFloat({ min: 0 }).withMessage('Unit price must be positive')
 ], async (req, res) => {
   try {
+    const { SalesOrder, Product, Inventory } = req.models;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -221,12 +221,14 @@ router.post('/', [
 // @access  Private (Admin/Manager)
 router.put('/:id', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('customer.name').optional().trim().notEmpty().withMessage('Customer name cannot be empty'),
   body('status').optional().isIn(['draft', 'confirmed', 'processing', 'partial', 'shipped', 'delivered', 'cancelled']).withMessage('Invalid status'),
   body('paymentStatus').optional().isIn(['pending', 'partial', 'paid', 'refunded']).withMessage('Invalid payment status')
 ], async (req, res) => {
   try {
+    const { SalesOrder } = req.models;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -287,12 +289,14 @@ router.put('/:id', [
 // @access  Private (Admin/Manager)
 router.post('/:id/ship', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('items').isArray({ min: 1 }).withMessage('Items are required'),
   body('items.*.product').notEmpty().withMessage('Product ID is required'),
   body('items.*.shippedQuantity').isInt({ min: 0 }).withMessage('Shipped quantity must be non-negative')
 ], async (req, res) => {
   try {
+    const { SalesOrder, Inventory } = req.models;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -403,8 +407,9 @@ router.post('/:id/ship', [
 // @route   POST /api/sales/:id/cancel
 // @desc    Cancel sales order
 // @access  Private (Admin/Manager)
-router.post('/:id/cancel', [auth, authorize('admin', 'manager')], async (req, res) => {
+router.post('/:id/cancel', [auth, requireClientCode, authorize('admin', 'manager')], async (req, res) => {
   try {
+    const { SalesOrder, Inventory } = req.models;
     const salesOrder = await SalesOrder.findById(req.params.id);
     if (!salesOrder) {
       return res.status(404).json({ message: 'Sales order not found' });
@@ -454,8 +459,9 @@ router.post('/:id/cancel', [auth, authorize('admin', 'manager')], async (req, re
 // @route   DELETE /api/sales/:id
 // @desc    Delete sales order
 // @access  Private (Admin)
-router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
+router.delete('/:id', [auth, requireClientCode, authorize('admin')], async (req, res) => {
   try {
+    const { SalesOrder, Inventory } = req.models;
     const salesOrder = await SalesOrder.findById(req.params.id);
 
     if (!salesOrder) {
@@ -494,8 +500,9 @@ router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
 // @route   GET /api/sales/reports/summary
 // @desc    Get sales summary report
 // @access  Private
-router.get('/reports/summary', auth, async (req, res) => {
+router.get('/reports/summary', [auth, requireClientCode], async (req, res) => {
   try {
+    const { SalesOrder } = req.models;
     const { startDate, endDate, warehouse } = req.query;
     const matchStage = {};
 

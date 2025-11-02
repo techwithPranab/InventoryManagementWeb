@@ -1,12 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { body, validationResult } = require('express-validator');
-const Warehouse = require('../models/Warehouse');
-const Inventory = require('../models/Inventory');
-const InventoryTransfer = require('../models/InventoryTransfer');
-const Product = require('../models/Product');
-const User = require('../models/User');
-const { auth, authorize } = require('../middleware/auth');
+const { auth, authorize, requireClientCode } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -14,8 +9,9 @@ const router = express.Router();
 // @route   GET /api/warehouses/transfers
 // @desc    Get all inventory transfers
 // @access  Private
-router.get('/transfers', auth, async (req, res) => {
+router.get('/transfers', [auth, requireClientCode], async (req, res) => {
   try {
+    const { InventoryTransfer, Warehouse, Product } = req.models;
     const { 
       page = 1, 
       limit = 10, 
@@ -77,8 +73,9 @@ router.get('/transfers', auth, async (req, res) => {
 // @route   GET /api/warehouses
 // @desc    Get all warehouses
 // @access  Private
-router.get('/', auth, async (req, res) => {
+router.get('/', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Warehouse, Inventory } = req.models;
     const { page = 1, limit = 10, search, isActive } = req.query;
     const query = {};
 
@@ -139,8 +136,9 @@ router.get('/', auth, async (req, res) => {
 // @route   GET /api/warehouses/:id
 // @desc    Get warehouse by ID
 // @access  Private
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Warehouse, Inventory } = req.models;
     const warehouse = await Warehouse.findById(req.params.id)
       .populate('manager', 'name email phone')
       .populate('createdBy', 'name email');
@@ -186,12 +184,14 @@ router.get('/:id', auth, async (req, res) => {
 // @access  Private (Admin/Manager)
 router.post('/', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('name').trim().notEmpty().withMessage('Warehouse name is required'),
   body('code').trim().notEmpty().withMessage('Warehouse code is required'),
   body('capacity').optional().isNumeric().withMessage('Capacity must be a number')
 ], async (req, res) => {
   try {
+    const { Warehouse } = req.models;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -260,12 +260,14 @@ router.post('/', [
 // @access  Private (Admin/Manager)
 router.put('/:id', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('name').optional().trim().notEmpty().withMessage('Warehouse name cannot be empty'),
   body('code').optional().trim().notEmpty().withMessage('Warehouse code cannot be empty'),
   body('capacity').optional().isNumeric().withMessage('Capacity must be a number')
 ], async (req, res) => {
   try {
+    const { Warehouse } = req.models;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -341,8 +343,9 @@ router.put('/:id', [
 // @route   DELETE /api/warehouses/:id
 // @desc    Delete warehouse
 // @access  Private (Admin)
-router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
+router.delete('/:id', [auth, requireClientCode, authorize('admin')], async (req, res) => {
   try {
+    const { Warehouse, Inventory } = req.models;
     // Check if warehouse has inventory
     const inventoryCount = await Inventory.countDocuments({ 
       warehouse: req.params.id,
@@ -377,8 +380,9 @@ router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
 // @route   GET /api/warehouses/:id/inventory
 // @desc    Get warehouse inventory
 // @access  Private
-router.get('/:id/inventory', auth, async (req, res) => {
+router.get('/:id/inventory', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Warehouse, Inventory } = req.models;
     const { page = 1, limit = 10, search } = req.query;
     const warehouse = await Warehouse.findById(req.params.id);
 
@@ -498,11 +502,13 @@ router.get('/:id/inventory', auth, async (req, res) => {
 // @access  Private (Admin/Manager)
 router.put('/:id/inventory/:productId', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('quantity').isNumeric().withMessage('Quantity must be a number'),
   body('reservedQuantity').optional().isNumeric().withMessage('Reserved quantity must be a number')
 ], async (req, res) => {
   try {
+    const { Inventory } = req.models;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -545,6 +551,7 @@ router.put('/:id/inventory/:productId', [
 // @access  Private (Admin/Manager)
 router.post('/transfer', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('product').notEmpty().withMessage('Product is required'),
   body('fromWarehouse').notEmpty().withMessage('Source warehouse is required'),
@@ -553,6 +560,7 @@ router.post('/transfer', [
   body('reason').isIn(['restock', 'relocation', 'demand', 'maintenance', 'other']).withMessage('Invalid reason')
 ], async (req, res) => {
   try {
+    const { Warehouse, Inventory, InventoryTransfer, Product } = req.models;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -639,74 +647,12 @@ router.post('/transfer', [
   }
 });
 
-// @route   GET /api/warehouses/transfers
-// @desc    Get all inventory transfers
-// @access  Private
-router.get('/transfers', auth, async (req, res) => {
-  try {
-    const { 
-      page = 1, 
-      limit = 10, 
-      status, 
-      warehouse, 
-      product,
-      startDate,
-      endDate 
-    } = req.query;
-
-    const query = {};
-    
-    if (status) {
-      query.status = status;
-    }
-    
-    if (warehouse) {
-      query.$or = [
-        { fromWarehouse: warehouse },
-        { toWarehouse: warehouse }
-      ];
-    }
-    
-    if (product) {
-      query.product = product;
-    }
-    
-    if (startDate || endDate) {
-      query.transferDate = {};
-      if (startDate) query.transferDate.$gte = new Date(startDate);
-      if (endDate) query.transferDate.$lte = new Date(endDate);
-    }
-
-    const transfers = await InventoryTransfer.find(query)
-      .populate('product', 'name sku')
-      .populate('fromWarehouse', 'name code')
-      .populate('toWarehouse', 'name code')
-      .populate('initiatedBy', 'name email')
-      .populate('approvedBy', 'name email')
-      .populate('completedBy', 'name email')
-      .sort({ transferDate: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
-
-    const total = await InventoryTransfer.countDocuments(query);
-
-    res.json({
-      transfers,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
-      total
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
 // @route   PUT /api/warehouses/transfers/:id/approve
 // @desc    Approve inventory transfer
 // @access  Private (Admin/Manager)
-router.put('/transfers/:id/approve', [auth, authorize('admin', 'manager')], async (req, res) => {
+router.put('/transfers/:id/approve', [auth, requireClientCode, authorize('admin', 'manager')], async (req, res) => {
   try {
+    const { InventoryTransfer } = req.models;
     const transfer = await InventoryTransfer.findById(req.params.id);
 
     if (!transfer) {
@@ -741,8 +687,9 @@ router.put('/transfers/:id/approve', [auth, authorize('admin', 'manager')], asyn
 // @route   PUT /api/warehouses/transfers/:id/complete
 // @desc    Complete inventory transfer
 // @access  Private (Admin/Manager)
-router.put('/transfers/:id/complete', [auth, authorize('admin', 'manager')], async (req, res) => {
+router.put('/transfers/:id/complete', [auth, requireClientCode, authorize('admin', 'manager')], async (req, res) => {
   try {
+    const { InventoryTransfer, Inventory } = req.models;
     const transfer = await InventoryTransfer.findById(req.params.id);
 
     if (!transfer) {
@@ -801,8 +748,9 @@ router.put('/transfers/:id/complete', [auth, authorize('admin', 'manager')], asy
 // @route   DELETE /api/warehouses/transfers/:id
 // @desc    Cancel inventory transfer
 // @access  Private (Admin/Manager)
-router.delete('/transfers/:id', [auth, authorize('admin', 'manager')], async (req, res) => {
+router.delete('/transfers/:id', [auth, requireClientCode, authorize('admin', 'manager')], async (req, res) => {
   try {
+    const { InventoryTransfer, Inventory } = req.models;
     const transfer = await InventoryTransfer.findById(req.params.id);
 
     if (!transfer) {
@@ -834,8 +782,9 @@ router.delete('/transfers/:id', [auth, authorize('admin', 'manager')], async (re
 // @route   GET /api/warehouses/:id/analytics
 // @desc    Get warehouse analytics and performance metrics
 // @access  Private
-router.get('/:id/analytics', auth, async (req, res) => {
+router.get('/:id/analytics', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Warehouse, Inventory, InventoryTransfer } = req.models;
     const { period = '30' } = req.query;
     const days = parseInt(period);
     const startDate = new Date();

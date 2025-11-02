@@ -98,11 +98,11 @@ router.get('/:id', [auth, requireClientCode], async (req, res) => {
 
 // @route   POST /api/products
 // @desc    Create new product
-// @access  Private (Admin/Manager)
+// @access  Private (Admin/Manager/Staff)
 router.post('/', [
   auth,
   requireClientCode,
-  authorize('admin', 'manager'),
+  authorize('admin', 'manager', 'staff'),
   body('name').trim().notEmpty().withMessage('Product name is required'),
   body('sku').trim().notEmpty().withMessage('SKU is required'),
   body('category').notEmpty().withMessage('Category is required'),
@@ -187,11 +187,11 @@ router.post('/', [
 
 // @route   PUT /api/products/:id
 // @desc    Update product
-// @access  Private (Admin/Manager)
+// @access  Private (Admin/Manager/Staff)
 router.put('/:id', [
   auth,
   requireClientCode,
-  authorize('admin', 'manager'),
+  authorize('admin', 'manager', 'staff'),
   body('name').optional().trim().notEmpty().withMessage('Product name cannot be empty'),
   body('sku').optional().trim().notEmpty().withMessage('SKU cannot be empty'),
   body('costPrice').optional().isNumeric().withMessage('Cost price must be a number'),

@@ -45,6 +45,7 @@ const auth = async (req, res, next) => {
     // Set user info from token
     req.user = {
       id: decoded.userId || decoded.id,
+      _id: decoded.userId || decoded.id, // Add _id as alias for backward compatibility
       email: decoded.email,
       role: decoded.role
     };
@@ -97,7 +98,7 @@ const authorize = (...roles) => {
 
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({ 
-        message: 'Access denied. Insufficient permissions' 
+        message: 'Access denied. Insufficient permissions'
       });
     }
 
