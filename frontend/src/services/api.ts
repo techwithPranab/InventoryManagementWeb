@@ -53,7 +53,7 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     const clientCode = localStorage.getItem('clientCode');
-    
+    console.log('API Request - Client Code:', clientCode);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

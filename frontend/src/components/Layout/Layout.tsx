@@ -31,6 +31,7 @@ import {
   Assessment,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { formatClientCodeDisplay } from '../../utils/clientUtils';
 import Footer from '../Common/Footer';
 
 const drawerWidth = 240;
@@ -58,7 +59,7 @@ const navigationItems: NavigationItem[] = [
 const Layout: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { user, logout } = useAuth();
+  const { user, logout, clientCode } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -132,7 +133,24 @@ const Layout: React.FC = () => {
             {navigationItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2">{user?.name}</Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', mr: 1 }}>
+              <Typography variant="body2">{user?.name}</Typography>
+              {clientCode && (
+                <Box 
+                  sx={{ 
+                    bgcolor: 'rgba(255, 255, 255, 0.2)', 
+                    px: 1, 
+                    py: 0.25, 
+                    borderRadius: 1,
+                    mt: 0.25
+                  }}
+                >
+                  <Typography variant="caption" sx={{ fontSize: '0.7rem', fontWeight: 500 }}>
+                    {formatClientCodeDisplay(clientCode)}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
             <IconButton
               size="large"
               aria-label="account of current user"

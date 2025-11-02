@@ -145,7 +145,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Login with AdminBackend
       const response = await authAPI.login({ email, password });
       const { user, token, clientCode, inventorySetup } = response.data.data;
-
+      console.log('Login response:', response.data);
       // Store basic auth data
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));

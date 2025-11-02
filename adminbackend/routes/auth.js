@@ -160,7 +160,7 @@ router.post('/login', [
     } catch (setupError) {
       console.log('No inventory setup found for user:', user.email);
     }
-
+    console.log('Login attempt - Client Code:', clientCode);
     // Generate token
     const token = generateToken(user._id);
 
@@ -190,6 +190,7 @@ router.post('/login', [
         } : null
       }
     });
+    console.log('User logged in:', clientCode);
   } catch (error) {
     next(error);
   }
