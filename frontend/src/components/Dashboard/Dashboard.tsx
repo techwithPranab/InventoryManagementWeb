@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
@@ -14,6 +14,7 @@ import {
   Divider,
   IconButton,
   Tooltip,
+  Button,
 } from '@mui/material';
 import {
   TrendingUp,
@@ -25,10 +26,13 @@ import {
   Assignment,
   Refresh,
   MoreVert,
+  VpnKey,
 } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardAPI } from '../../services/api';
 import LoadingSpinner from '../Common/LoadingSpinner';
+import { useAuth } from '../../contexts/AuthContext';
+import PATTokenDialog from './PATTokenDialog';
 
 interface OverviewCardProps {
   title: string;
@@ -102,6 +106,10 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
 };
 
 const Dashboard: React.FC = () => {
+  const { user, inventorySetup, clientCode } = useAuth();
+  const [patDialogOpen, setPATDialogOpen] = useState(false);
+  const [inventorySetupId, setInventorySetupId] = useState<string | null>(null);
+
   const {
     data: overview,
     isLoading: overviewLoading,
@@ -197,11 +205,32 @@ const Dashboard: React.FC = () => {
             Welcome back! Here's what's happening with your inventory.
           </Typography>
         </Box>
-        <Tooltip title="Refresh Dashboard">
-          <IconButton onClick={handleRefresh} size="large">
-            <Refresh />
-          </IconButton>
-        </Tooltip>
+        <Box display="flex" gap={1}>
+          <Tooltip title="Manage API Token">
+            <Button
+              variant="outlined"
+              startIcon={<VpnKey />}
+              onClick={() => {
+                // Get inventory setup ID from auth context
+                const setupId = inventorySetup?._id || localStorage.getItem('inventorySetupId');
+                if (setupId) {
+                  setInventorySetupId(setupId);
+                  setPATDialogOpen(true);
+                } else {
+                  alert('Unable to find inventory setup. Please contact support.');
+                }
+              }}
+              size="small"
+            >
+              API Token
+            </Button>
+          </Tooltip>
+          <Tooltip title="Refresh Dashboard">
+            <IconButton onClick={handleRefresh} size="large">
+              <Refresh />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
 
       {/* Overview Cards */}
@@ -433,6 +462,16 @@ const Dashboard: React.FC = () => {
           </Card>
         </Box>
       </Box>
+
+      {/* PAT Token Dialog */}
+      {inventorySetupId && clientCode && (
+        <PATTokenDialog
+          open={patDialogOpen}
+          onClose={() => setPATDialogOpen(false)}
+          clientCode={clientCode}
+          inventorySetupId={inventorySetupId}
+        />
+      )}
     </Box>
   );
 };

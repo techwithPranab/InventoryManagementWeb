@@ -492,4 +492,134 @@ router.get('/stats/overview', [
   }
 });
 
+// @desc    Generate PAT token for inventory setup
+// @route   POST /api/inventory-setup/:id/pat-token
+// @access  Private
+router.post('/:id/pat-token', [
+  protect,
+  strictLimiter,
+  body('expiryDays')
+    .optional()
+    .isInt({ min: 1, max: 365 })
+    .withMessage('Expiry days must be between 1 and 365')
+], async (req, res, next) => {
+  try {
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const setup = await InventorySetup.findById(req.params.id);
+
+    if (!setup) {
+      return res.status(404).json({
+        success: false,
+        message: 'Inventory setup not found'
+      });
+    }
+
+    const expiryDays = req.body.expiryDays || 90;
+
+    // Generate PAT token
+    await setup.generatePATToken(expiryDays);
+
+    res.json({
+      success: true,
+      message: 'PAT token generated successfully',
+      data: {
+        token: setup.patToken.token,
+        expiryDate: setup.patToken.expiryDate,
+        createdAt: setup.patToken.createdAt
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @desc    Get PAT token info for inventory setup
+// @route   GET /api/inventory-setup/:id/pat-token
+// @access  Private
+router.get('/:id/pat-token', [
+  protect,
+  apiLimiter
+], async (req, res, next) => {
+  try {
+    const setup = await InventorySetup.findById(req.params.id);
+
+    if (!setup) {
+      return res.status(404).json({
+        success: false,
+        message: 'Inventory setup not found'
+      });
+    }
+
+    if (!setup.patToken || !setup.patToken.token) {
+      return res.json({
+        success: true,
+        data: {
+          hasToken: false,
+          message: 'No PAT token found'
+        }
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        hasToken: true,
+        token: setup.patToken.token,
+        expiryDate: setup.patToken.expiryDate,
+        createdAt: setup.patToken.createdAt,
+        lastUsedAt: setup.patToken.lastUsedAt,
+        isActive: setup.patToken.isActive,
+        isValid: setup.isPATTokenValid()
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @desc    Revoke PAT token for inventory setup
+// @route   DELETE /api/inventory-setup/:id/pat-token
+// @access  Private
+router.delete('/:id/pat-token', [
+  protect,
+  strictLimiter
+], async (req, res, next) => {
+  try {
+    const setup = await InventorySetup.findById(req.params.id);
+
+    if (!setup) {
+      return res.status(404).json({
+        success: false,
+        message: 'Inventory setup not found'
+      });
+    }
+
+    if (!setup.patToken || !setup.patToken.token) {
+      return res.status(404).json({
+        success: false,
+        message: 'No PAT token found to revoke'
+      });
+    }
+
+    // Revoke PAT token
+    await setup.revokePATToken();
+
+    res.json({
+      success: true,
+      message: 'PAT token revoked successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

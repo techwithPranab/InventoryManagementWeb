@@ -74,6 +74,27 @@ const InventorySetupSchema = new mongoose.Schema({
   notes: {
     type: String,
     trim: true
+  },
+
+  // Personal Access Token (PAT)
+  patToken: {
+    token: {
+      type: String,
+      trim: true
+    },
+    expiryDate: {
+      type: Date
+    },
+    createdAt: {
+      type: Date
+    },
+    lastUsedAt: {
+      type: Date
+    },
+    isActive: {
+      type: Boolean,
+      default: false
+    }
   }
 }, {
   timestamps: true
@@ -138,6 +159,52 @@ InventorySetupSchema.statics.getSetupStats = function() {
       }
     }
   ]);
+};
+
+// Method to generate PAT token
+InventorySetupSchema.methods.generatePATToken = function(expiryDays = 90) {
+  const crypto = require('crypto');
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiryDate = new Date();
+  expiryDate.setDate(expiryDate.getDate() + expiryDays);
+  
+  this.patToken = {
+    token: token,
+    expiryDate: expiryDate,
+    createdAt: new Date(),
+    isActive: true
+  };
+  
+  return this.save();
+};
+
+// Method to revoke PAT token
+InventorySetupSchema.methods.revokePATToken = function() {
+  if (this.patToken) {
+    this.patToken.isActive = false;
+  }
+  return this.save();
+};
+
+// Method to check if PAT token is valid
+InventorySetupSchema.methods.isPATTokenValid = function() {
+  if (!this.patToken || !this.patToken.isActive) {
+    return false;
+  }
+  if (new Date() > this.patToken.expiryDate) {
+    this.patToken.isActive = false;
+    this.save();
+    return false;
+  }
+  return true;
+};
+
+// Method to update PAT token last used date
+InventorySetupSchema.methods.updatePATTokenLastUsed = function() {
+  if (this.patToken) {
+    this.patToken.lastUsedAt = new Date();
+    return this.save();
+  }
 };
 
 module.exports = mongoose.model('InventorySetup', InventorySetupSchema);

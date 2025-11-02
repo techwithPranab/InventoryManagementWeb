@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import PATTokenDialog from '@/components/PATTokenDialog';
 import { api } from '@/lib/api';
 
 interface User {
@@ -33,6 +34,7 @@ export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [inventorySetup, setInventorySetup] = useState<InventorySetup | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [patDialogOpen, setPATDialogOpen] = useState(false);
   const router = useRouter();
 
   const getSetupStatusColor = (status: string) => {
@@ -129,13 +131,28 @@ export default function Dashboard() {
       
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {user.name}!
-          </h1>
-          <p className="text-gray-600">
-            Here's what's happening with your inventory today.
-          </p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Welcome back, {user.name}!
+            </h1>
+            <p className="text-gray-600">
+              Here's what's happening with your inventory today.
+            </p>
+          </div>
+          
+          {/* API Token Button */}
+          {inventorySetup && inventorySetup.setupStatus === 'completed' && (
+            <button
+              onClick={() => setPATDialogOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+              </svg>
+              API Token
+            </button>
+          )}
         </div>
 
         {/* User Info Card */}
@@ -272,6 +289,16 @@ export default function Dashboard() {
       </main>
       
       <Footer />
+
+      {/* PAT Token Dialog */}
+      {inventorySetup && (
+        <PATTokenDialog
+          open={patDialogOpen}
+          onClose={() => setPATDialogOpen(false)}
+          clientCode={inventorySetup.clientCode}
+          inventorySetupId={inventorySetup._id}
+        />
+      )}
     </div>
   );
 }
