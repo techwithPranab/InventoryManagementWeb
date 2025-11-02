@@ -16,6 +16,7 @@ import InventoryManagement from './components/Inventory/InventoryManagement';
 import Purchases from './components/Purchases/Purchases';
 import Sales from './components/Sales/Sales';
 import LoadingSpinner from './components/Common/LoadingSpinner';
+import ErrorBoundary from './components/Common/ErrorBoundary';
 import Manufacturers from './components/Manufacturers/Manufacturers';
 import Suppliers from './components/Suppliers/Suppliers';
 import ShippingManagement from './components/Shipping';
@@ -70,11 +71,13 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <BrowserRouter>
-          <AuthProvider>
-            <AppRoutes />
-          </AuthProvider>
-        </BrowserRouter>
+        <ErrorBoundary>
+          <BrowserRouter>
+            <AuthProvider>
+              <AppRoutes />
+            </AuthProvider>
+          </BrowserRouter>
+        </ErrorBoundary>
       </ThemeProvider>
     </QueryClientProvider>
   );

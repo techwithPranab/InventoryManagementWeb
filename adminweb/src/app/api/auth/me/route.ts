@@ -24,6 +24,7 @@ async function handler(req: AuthenticatedRequest) {
         email: user.email,
         role: user.role,
         mobileNo: user.mobileNo,
+        industry: user.industry,
         createdAt: user.createdAt
       }
     }, { status: 200 });

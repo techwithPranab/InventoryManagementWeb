@@ -2,14 +2,14 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const Category = require('../models/Category');
 const Product = require('../models/Product');
-const { auth, authorize } = require('../middleware/auth');
+const { auth, authorize, requireClientCode } = require('../middleware/auth');
 
 const router = express.Router();
 
 // @route   GET /api/categories
 // @desc    Get all categories
 // @access  Private
-router.get('/', auth, async (req, res) => {
+router.get('/', auth, requireClientCode, async (req, res) => {
   try {
     const { page = 1, limit, search, isActive } = req.query;
     const query = {};
@@ -22,7 +22,11 @@ router.get('/', auth, async (req, res) => {
       query.isActive = isActive === 'true';
     }
 
-    let categoriesQuery = Category.find(query)
+    // Use client database connection
+    const CategoryModel = req.clientConnection.model('Category', Category.schema);
+    const ProductModel = req.clientConnection.model('Product', Product.schema);
+
+    let categoriesQuery = CategoryModel.find(query)
       .populate('createdBy', 'name email')
       .sort({ name: 1 });
 
@@ -38,7 +42,7 @@ router.get('/', auth, async (req, res) => {
     // Add product count for each category
     const categoriesWithProductCount = await Promise.all(
       categories.map(async (category) => {
-        const productCount = await Product.countDocuments({ 
+        const productCount = await ProductModel.countDocuments({ 
           category: category._id,
           isActive: true 
         });
@@ -49,7 +53,7 @@ router.get('/', auth, async (req, res) => {
       })
     );
 
-    const total = await Category.countDocuments(query);
+    const total = await CategoryModel.countDocuments(query);
 
     // Return different response structure based on whether pagination was requested
     if (limit) {
@@ -75,9 +79,10 @@ router.get('/', auth, async (req, res) => {
 // @route   GET /api/categories/:id
 // @desc    Get category by ID
 // @access  Private
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', auth, requireClientCode, async (req, res) => {
   try {
-    const category = await Category.findById(req.params.id)
+    const CategoryModel = req.clientConnection.model('Category', Category.schema);
+    const category = await CategoryModel.findById(req.params.id)
       .populate('createdBy', 'name email');
 
     if (!category) {
@@ -85,7 +90,8 @@ router.get('/:id', auth, async (req, res) => {
     }
 
     // Get product count for this category
-    const productCount = await Product.countDocuments({ 
+    const ProductModel = req.clientConnection.model('Product', Product.schema);
+    const productCount = await ProductModel.countDocuments({ 
       category: category._id, 
       isActive: true 
     });
@@ -108,6 +114,7 @@ router.get('/:id', auth, async (req, res) => {
 // @access  Private (Admin/Manager)
 router.post('/', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('name').trim().notEmpty().withMessage('Category name is required'),
   body('description').optional().trim()
@@ -124,7 +131,8 @@ router.post('/', [
     const { name, description, image } = req.body;
 
     // Check if category already exists
-    const existingCategory = await Category.findOne({ 
+    const CategoryModel = req.clientConnection.model('Category', Category.schema);
+    const existingCategory = await CategoryModel.findOne({ 
       name: { $regex: `^${name}$`, $options: 'i' } 
     });
 
@@ -132,7 +140,7 @@ router.post('/', [
       return res.status(400).json({ message: 'Category already exists' });
     }
 
-    const category = new Category({
+    const category = new CategoryModel({
       name,
       description,
       image,
@@ -157,6 +165,7 @@ router.post('/', [
 // @access  Private (Admin/Manager)
 router.put('/:id', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('name').optional().trim().notEmpty().withMessage('Category name cannot be empty'),
   body('description').optional().trim()
@@ -178,9 +187,11 @@ router.put('/:id', [
     if (image !== undefined) updateFields.image = image;
     if (isActive !== undefined) updateFields.isActive = isActive;
 
+    const CategoryModel = req.clientConnection.model('Category', Category.schema);
+
     // Check if new name already exists for another category
     if (name) {
-      const existingCategory = await Category.findOne({ 
+      const existingCategory = await CategoryModel.findOne({ 
         name: { $regex: `^${name}$`, $options: 'i' },
         _id: { $ne: req.params.id }
       });
@@ -190,7 +201,7 @@ router.put('/:id', [
       }
     }
 
-    const category = await Category.findByIdAndUpdate(
+    const category = await CategoryModel.findByIdAndUpdate(
       req.params.id,
       updateFields,
       { new: true, runValidators: true }
@@ -216,10 +227,13 @@ router.put('/:id', [
 // @route   DELETE /api/categories/:id
 // @desc    Delete category
 // @access  Private (Admin)
-router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
+router.delete('/:id', [auth, requireClientCode, authorize('admin')], async (req, res) => {
   try {
+    const ProductModel = req.clientConnection.model('Product', Product.schema);
+    const CategoryModel = req.clientConnection.model('Category', Category.schema);
+
     // Check if category has associated products
-    const productCount = await Product.countDocuments({ 
+    const productCount = await ProductModel.countDocuments({ 
       category: req.params.id 
     });
 
@@ -229,7 +243,7 @@ router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
       });
     }
 
-    const category = await Category.findByIdAndDelete(req.params.id);
+    const category = await CategoryModel.findByIdAndDelete(req.params.id);
 
     if (!category) {
       return res.status(404).json({ message: 'Category not found' });
@@ -248,16 +262,19 @@ router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
 // @route   GET /api/categories/:id/products
 // @desc    Get products by category
 // @access  Private
-router.get('/:id/products', auth, async (req, res) => {
+router.get('/:id/products', auth, requireClientCode, async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
 
-    const category = await Category.findById(req.params.id);
+    const CategoryModel = req.clientConnection.model('Category', Category.schema);
+    const ProductModel = req.clientConnection.model('Product', Product.schema);
+
+    const category = await CategoryModel.findById(req.params.id);
     if (!category) {
       return res.status(404).json({ message: 'Category not found' });
     }
 
-    const products = await Product.find({ 
+    const products = await ProductModel.find({ 
       category: req.params.id,
       isActive: true 
     })
@@ -267,7 +284,7 @@ router.get('/:id/products', auth, async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    const total = await Product.countDocuments({ 
+    const total = await ProductModel.countDocuments({ 
       category: req.params.id,
       isActive: true 
     });

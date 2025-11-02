@@ -1,26 +1,56 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const mongoose = require('mongoose');
+
+// Create a dynamic connection to client database
+const getClientConnection = (clientCode) => {
+  const dbName = `inventory_management_${clientCode}`;
+  const connectionString = process.env.MONGODB_URI.replace(/\/[^\/]*$/, `/${dbName}`);
+  
+  return mongoose.createConnection(connectionString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+};
 
 const auth = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
+    const clientCode = req.header('X-Client-Code');
 
     if (!token) {
       return res.status(401).json({ message: 'No token, authorization denied' });
     }
 
+    // Verify JWT token (from AdminWeb)
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select('-password');
+    
+    // Set user info from token
+    req.user = {
+      id: decoded.userId || decoded.id,
+      email: decoded.email,
+      role: decoded.role
+    };
 
-    if (!user) {
-      return res.status(401).json({ message: 'Token is not valid' });
+    // If client code is provided, set up client database connection
+    if (clientCode) {
+      try {
+        const clientConnection = getClientConnection(clientCode);
+        req.clientConnection = clientConnection;
+        req.clientCode = clientCode;
+        
+        // Wait for connection to be ready
+        await new Promise((resolve, reject) => {
+          clientConnection.once('open', resolve);
+          clientConnection.once('error', reject);
+          setTimeout(() => reject(new Error('Database connection timeout')), 5000);
+        });
+      } catch (dbError) {
+        return res.status(400).json({ 
+          message: 'Invalid client code or database connection failed' 
+        });
+      }
     }
 
-    if (!user.isActive) {
-      return res.status(401).json({ message: 'User account is deactivated' });
-    }
-
-    req.user = user;
     next();
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
@@ -29,6 +59,7 @@ const auth = async (req, res, next) => {
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ message: 'Token expired' });
     }
+    console.error('Auth middleware error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -49,4 +80,14 @@ const authorize = (...roles) => {
   };
 };
 
-module.exports = { auth, authorize };
+// Middleware to require client code
+const requireClientCode = (req, res, next) => {
+  if (!req.clientCode) {
+    return res.status(400).json({ 
+      message: 'Client code is required for this operation' 
+    });
+  }
+  next();
+};
+
+module.exports = { auth, authorize, requireClientCode, getClientConnection };

@@ -30,8 +30,9 @@ export const suppliersAPI = {
 
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const ADMINWEB_API_URL = process.env.REACT_APP_ADMINWEB_API_URL || 'http://localhost:5001/api';
 
-// Create axios instance
+// Create axios instance for backend
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -39,8 +40,35 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+// Create axios instance for AdminBackend
+const adminWebAPI = axios.create({
+  baseURL: ADMINWEB_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request interceptor to add auth token and client code
 api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    const clientCode = localStorage.getItem('clientCode');
+    
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (clientCode) {
+      config.headers['X-Client-Code'] = clientCode;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// AdminBackend request interceptor
+adminWebAPI.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -62,22 +90,40 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem('clientCode');
       window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 
-// Auth API
+// AdminBackend response interceptor
+adminWebAPI.interceptors.response.use(
+  (response: AxiosResponse) => {
+    return response;
+  },
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('clientCode');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Auth API - Use AdminBackend for authentication
 export const authAPI = {
   login: (credentials: { email: string; password: string }) =>
-    api.post('/auth/login', credentials),
-  register: (userData: { name: string; email: string; password: string; role?: string }) =>
-    api.post('/auth/register', userData),
-  getProfile: () => api.get('/auth/me'),
-  updateProfile: (data: any) => api.put('/auth/profile', data),
+    adminWebAPI.post('/auth/login', credentials),
+  getProfile: () => adminWebAPI.get('/auth/me'),
+  updateProfile: (data: any) => adminWebAPI.put('/auth/profile', data),
   changePassword: (data: { currentPassword: string; newPassword: string }) =>
-    api.put('/auth/change-password', data),
+    adminWebAPI.put('/auth/change-password', data),
+  // Get client inventory setup data
+  getInventorySetup: (email: string) =>
+    adminWebAPI.get(`/inventory-setup/email/${encodeURIComponent(email)}`),
 };
 
 // Categories API

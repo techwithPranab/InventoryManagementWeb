@@ -6,20 +6,30 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'manager' | 'staff';
+  role: 'admin' | 'manager' | 'staff' | 'client';
+  mobileNo?: string;
+  industry?: string;
   avatar?: string;
+}
+
+interface InventorySetup {
+  _id: string;
+  clientCode: string;
+  databaseName: string;
+  setupStatus: 'pending' | 'in_progress' | 'completed' | 'failed';
 }
 
 interface AuthState {
   user: User | null;
   token: string | null;
+  clientCode: string | null;
+  inventorySetup: InventorySetup | null;
   isLoading: boolean;
   isAuthenticated: boolean;
 }
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
-  register: (userData: { name: string; email: string; password: string; role?: string }) => Promise<void>;
   logout: () => void;
   updateProfile: (data: any) => Promise<void>;
 }
@@ -28,16 +38,19 @@ interface AuthContextType extends AuthState {
 const initialState: AuthState = {
   user: null,
   token: localStorage.getItem('token'),
+  clientCode: localStorage.getItem('clientCode'),
+  inventorySetup: null,
   isLoading: true,
   isAuthenticated: false,
 };
 
 // Action types
 type AuthAction =
-  | { type: 'LOGIN_SUCCESS'; payload: { user: User; token: string } }
+  | { type: 'LOGIN_SUCCESS'; payload: { user: User; token: string; clientCode?: string; inventorySetup?: InventorySetup } }
   | { type: 'LOGOUT' }
   | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'UPDATE_USER'; payload: User };
+  | { type: 'UPDATE_USER'; payload: User }
+  | { type: 'SET_INVENTORY_SETUP'; payload: InventorySetup };
 
 // Reducer
 const authReducer = (state: AuthState, action: AuthAction): AuthState => {
@@ -47,6 +60,8 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
         ...state,
         user: action.payload.user,
         token: action.payload.token,
+        clientCode: action.payload.clientCode || null,
+        inventorySetup: action.payload.inventorySetup || null,
         isAuthenticated: true,
         isLoading: false,
       };
@@ -55,6 +70,8 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
         ...state,
         user: null,
         token: null,
+        clientCode: null,
+        inventorySetup: null,
         isAuthenticated: false,
         isLoading: false,
       };
@@ -67,6 +84,12 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       return {
         ...state,
         user: action.payload,
+      };
+    case 'SET_INVENTORY_SETUP':
+      return {
+        ...state,
+        inventorySetup: action.payload,
+        clientCode: action.payload.clientCode,
       };
     default:
       return state;
@@ -92,18 +115,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (token && userData) {
         try {
-          // Verify token is still valid
-          const response = await authAPI.getProfile();
-          const user = response.data.user;
-
+          // Parse stored user data instead of making API call to avoid issues
+          const user = JSON.parse(userData);
+          
           dispatch({
             type: 'LOGIN_SUCCESS',
             payload: { user, token },
           });
         } catch (error) {
-          // Token is invalid, clear storage
+          // If parsing fails or token is invalid, clear storage
           localStorage.removeItem('token');
           localStorage.removeItem('user');
+          localStorage.removeItem('clientCode');
           dispatch({ type: 'LOGOUT' });
         }
       } else {
@@ -118,47 +141,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       
+      // Login with AdminBackend
       const response = await authAPI.login({ email, password });
-      const { user, token } = response.data;
+      const { user, token } = response.data.data; // Extract from response.data.data
 
-      // Store in localStorage
+      // Store basic auth data
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
 
+      // Skip inventory setup for now to simplify login
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: { user, token },
       });
+      
     } catch (error: any) {
       dispatch({ type: 'SET_LOADING', payload: false });
       throw new Error(error.response?.data?.message || 'Login failed');
     }
   };
 
-  const register = async (userData: { name: string; email: string; password: string; role?: string }) => {
-    try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      
-      const response = await authAPI.register(userData);
-      const { user, token } = response.data;
-
-      // Store in localStorage
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-
-      dispatch({
-        type: 'LOGIN_SUCCESS',
-        payload: { user, token },
-      });
-    } catch (error: any) {
-      dispatch({ type: 'SET_LOADING', payload: false });
-      throw new Error(error.response?.data?.message || 'Registration failed');
-    }
-  };
-
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('clientCode');
     dispatch({ type: 'LOGOUT' });
   };
 
@@ -182,7 +188,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value: AuthContextType = {
     ...state,
     login,
-    register,
     logout,
     updateProfile,
   };

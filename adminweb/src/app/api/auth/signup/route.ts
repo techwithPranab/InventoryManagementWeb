@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import { hashPassword, generateToken } from '@/lib/auth';
+import jwt from 'jsonwebtoken';
 
 export async function POST(req: NextRequest) {
   try {
@@ -59,27 +60,35 @@ export async function POST(req: NextRequest) {
     const savedUser = await newUser.save();
 
     // Generate JWT token
-    const token = generateToken({
-      userId: savedUser._id.toString(),
-      email: savedUser.email,
-      role: savedUser.role
-    });
-
-    // Return success response
-    return NextResponse.json({
-      message: 'User created successfully',
-      token,
-      user: {
-        id: savedUser._id,
-        name: savedUser.name,
+    const token = jwt.sign(
+      { 
+        userId: savedUser._id, 
         email: savedUser.email,
-        role: savedUser.role,
-        mobileNo: savedUser.mobileNo,
-        industry: savedUser.industry
-      }
-    }, { status: 201 });
+        name: savedUser.name 
+      },
+      process.env.JWT_SECRET as string,
+      { expiresIn: '7d' }
+    );
 
-  } catch (error) {
+    const response = NextResponse.json(
+      {
+        message: 'User created successfully',
+        user: {
+          id: savedUser._id,
+          name: savedUser.name,
+          email: savedUser.email,
+          mobile: savedUser.mobileNo,
+          companyName: savedUser.companyName,
+          industry: savedUser.industry,
+          role: savedUser.role,
+          createdAt: savedUser.createdAt
+        },
+        token
+      },
+      { status: 201 }
+    );
+
+    return response;  } catch (error) {
     console.error('Signup error:', error);
     
     // Handle mongoose validation errors
