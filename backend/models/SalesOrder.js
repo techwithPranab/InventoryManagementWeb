@@ -143,4 +143,7 @@ salesOrderSchema.index({ orderDate: -1 });
 salesOrderSchema.index({ warehouse: 1 });
 salesOrderSchema.index({ paymentStatus: 1 });
 
-module.exports = mongoose.model('SalesOrder', salesOrderSchema);
+const SalesOrder = mongoose.model('SalesOrder', salesOrderSchema);
+
+module.exports = SalesOrder;
+module.exports.schema = salesOrderSchema;

@@ -100,4 +100,7 @@ productSchema.index({ category: 1 });
 productSchema.index({ isActive: 1 });
 productSchema.index({ name: 'text', description: 'text', brand: 'text' });
 
-module.exports = mongoose.model('Product', productSchema);
+const Product = mongoose.model('Product', productSchema);
+
+module.exports = Product;
+module.exports.schema = productSchema;

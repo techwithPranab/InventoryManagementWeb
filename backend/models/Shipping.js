@@ -48,4 +48,7 @@ const shippingSchema = new mongoose.Schema({
 
 shippingSchema.index({ trackingNumber: 1 });
 
-module.exports = mongoose.model('Shipping', shippingSchema);
+const Shipping = mongoose.model('Shipping', shippingSchema);
+
+module.exports = Shipping;
+module.exports.schema = shippingSchema;

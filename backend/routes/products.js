@@ -1,17 +1,16 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const Product = require('../models/Product');
-const Category = require('../models/Category');
-const Inventory = require('../models/Inventory');
-const { auth, authorize } = require('../middleware/auth');
+const { auth, authorize, requireClientCode } = require('../middleware/auth');
 
 const router = express.Router();
 
 // @route   GET /api/products
 // @desc    Get all products
 // @access  Private
-router.get('/', auth, async (req, res) => {
+router.get('/', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Product, Category, Inventory } = req.models;
+    
     const { 
       page = 1, 
       limit = 10, 
@@ -68,8 +67,10 @@ router.get('/', auth, async (req, res) => {
 // @route   GET /api/products/:id
 // @desc    Get product by ID
 // @access  Private
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Product, Inventory } = req.models;
+    
     const product = await Product.findById(req.params.id)
       .populate('category', 'name description')
       .populate('createdBy', 'name email');
@@ -100,6 +101,7 @@ router.get('/:id', auth, async (req, res) => {
 // @access  Private (Admin/Manager)
 router.post('/', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('name').trim().notEmpty().withMessage('Product name is required'),
   body('sku').trim().notEmpty().withMessage('SKU is required'),
@@ -109,6 +111,8 @@ router.post('/', [
   body('unit').isIn(['piece', 'kg', 'liter', 'meter', 'box', 'dozen']).withMessage('Invalid unit')
 ], async (req, res) => {
   try {
+    const { Product, Category } = req.models;
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -162,7 +166,7 @@ router.post('/', [
       barcode,
       weight,
       dimensions,
-      createdBy: req.user._id
+      createdBy: req.user.id
     });
 
     await product.save();
@@ -186,6 +190,7 @@ router.post('/', [
 // @access  Private (Admin/Manager)
 router.put('/:id', [
   auth,
+  requireClientCode,
   authorize('admin', 'manager'),
   body('name').optional().trim().notEmpty().withMessage('Product name cannot be empty'),
   body('sku').optional().trim().notEmpty().withMessage('SKU cannot be empty'),
@@ -194,6 +199,8 @@ router.put('/:id', [
   body('unit').optional().isIn(['piece', 'kg', 'liter', 'meter', 'box', 'dozen']).withMessage('Invalid unit')
 ], async (req, res) => {
   try {
+    const { Product, Category } = req.models;
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ 
@@ -269,8 +276,10 @@ router.put('/:id', [
 // @route   DELETE /api/products/:id
 // @desc    Delete product
 // @access  Private (Admin)
-router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
+router.delete('/:id', [auth, requireClientCode, authorize('admin')], async (req, res) => {
   try {
+    const { Product, Inventory } = req.models;
+    
     // Check if product has inventory
     const inventoryCount = await Inventory.countDocuments({ 
       product: req.params.id,
@@ -305,8 +314,10 @@ router.delete('/:id', [auth, authorize('admin')], async (req, res) => {
 // @route   GET /api/products/low-stock
 // @desc    Get products with low stock
 // @access  Private
-router.get('/reports/low-stock', auth, async (req, res) => {
+router.get('/reports/low-stock', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Inventory } = req.models;
+    
     const { warehouse } = req.query;
     const inventoryQuery = {};
 
@@ -364,8 +375,10 @@ router.get('/reports/low-stock', auth, async (req, res) => {
 // @route   GET /api/products/search
 // @desc    Search products by text
 // @access  Private
-router.get('/search/text', auth, async (req, res) => {
+router.get('/search/text', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Product } = req.models;
+    
     const { q, limit = 10 } = req.query;
 
     if (!q) {

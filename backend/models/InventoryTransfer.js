@@ -78,4 +78,7 @@ inventoryTransferSchema.index({ toWarehouse: 1 });
 inventoryTransferSchema.index({ status: 1 });
 inventoryTransferSchema.index({ transferDate: -1 });
 
-module.exports = mongoose.model('InventoryTransfer', inventoryTransferSchema);
+const InventoryTransfer = mongoose.model('InventoryTransfer', inventoryTransferSchema);
+
+module.exports = InventoryTransfer;
+module.exports.schema = inventoryTransferSchema;

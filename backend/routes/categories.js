@@ -1,7 +1,5 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const Category = require('../models/Category');
-const Product = require('../models/Product');
 const { auth, authorize, requireClientCode } = require('../middleware/auth');
 
 const router = express.Router();
@@ -9,8 +7,10 @@ const router = express.Router();
 // @route   GET /api/categories
 // @desc    Get all categories
 // @access  Private
-router.get('/', auth, requireClientCode, async (req, res) => {
+router.get('/', [auth, requireClientCode], async (req, res) => {
   try {
+    const { Category, Product } = req.models;
+    
     const { page = 1, limit, search, isActive } = req.query;
     const query = {};
 
@@ -22,11 +22,7 @@ router.get('/', auth, requireClientCode, async (req, res) => {
       query.isActive = isActive === 'true';
     }
 
-    // Use client database connection
-    const CategoryModel = req.clientConnection.model('Category', Category.schema);
-    const ProductModel = req.clientConnection.model('Product', Product.schema);
-
-    let categoriesQuery = CategoryModel.find(query)
+    let categoriesQuery = Category.find(query)
       .populate('createdBy', 'name email')
       .sort({ name: 1 });
 
@@ -42,7 +38,7 @@ router.get('/', auth, requireClientCode, async (req, res) => {
     // Add product count for each category
     const categoriesWithProductCount = await Promise.all(
       categories.map(async (category) => {
-        const productCount = await ProductModel.countDocuments({ 
+        const productCount = await Product.countDocuments({ 
           category: category._id,
           isActive: true 
         });
@@ -53,7 +49,7 @@ router.get('/', auth, requireClientCode, async (req, res) => {
       })
     );
 
-    const total = await CategoryModel.countDocuments(query);
+    const total = await Category.countDocuments(query);
 
     // Return different response structure based on whether pagination was requested
     if (limit) {
@@ -79,7 +75,7 @@ router.get('/', auth, requireClientCode, async (req, res) => {
 // @route   GET /api/categories/:id
 // @desc    Get category by ID
 // @access  Private
-router.get('/:id', auth, requireClientCode, async (req, res) => {
+router.get('/:id', [auth, requireClientCode], async (req, res) => {
   try {
     const CategoryModel = req.clientConnection.model('Category', Category.schema);
     const category = await CategoryModel.findById(req.params.id)

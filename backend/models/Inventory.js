@@ -47,4 +47,7 @@ inventorySchema.index({ product: 1, warehouse: 1 }, { unique: true });
 inventorySchema.index({ warehouse: 1 });
 inventorySchema.index({ quantity: 1 });
 
-module.exports = mongoose.model('Inventory', inventorySchema);
+const Inventory = mongoose.model('Inventory', inventorySchema);
+
+module.exports = Inventory;
+module.exports.schema = inventorySchema;

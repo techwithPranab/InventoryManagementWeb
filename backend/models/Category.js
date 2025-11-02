@@ -32,4 +32,7 @@ const categorySchema = new mongoose.Schema({
 categorySchema.index({ name: 1 });
 categorySchema.index({ isActive: 1 });
 
-module.exports = mongoose.model('Category', categorySchema);
+const Category = mongoose.model('Category', categorySchema);
+
+module.exports = Category;
+module.exports.schema = categorySchema;

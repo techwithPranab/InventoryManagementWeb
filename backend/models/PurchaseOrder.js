@@ -148,4 +148,7 @@ purchaseOrderSchema.index({ status: 1 });
 purchaseOrderSchema.index({ orderDate: -1 });
 purchaseOrderSchema.index({ warehouse: 1 });
 
-module.exports = mongoose.model('PurchaseOrder', purchaseOrderSchema);
+const PurchaseOrder = mongoose.model('PurchaseOrder', purchaseOrderSchema);
+
+module.exports = PurchaseOrder;
+module.exports.schema = purchaseOrderSchema;

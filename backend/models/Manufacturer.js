@@ -29,4 +29,7 @@ const manufacturerSchema = new mongoose.Schema({
 
 manufacturerSchema.index({ name: 1 });
 
-module.exports = mongoose.model('Manufacturer', manufacturerSchema);
+const Manufacturer = mongoose.model('Manufacturer', manufacturerSchema);
+
+module.exports = Manufacturer;
+module.exports.schema = manufacturerSchema;

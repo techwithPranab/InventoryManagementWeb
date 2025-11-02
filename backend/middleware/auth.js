@@ -1,15 +1,33 @@
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const { getClientModels } = require('../utils/clientModels');
+
+// Track client connections
+const clientConnections = new Map();
 
 // Create a dynamic connection to client database
 const getClientConnection = (clientCode) => {
+  if (clientConnections.has(clientCode)) {
+    return clientConnections.get(clientCode);
+  }
+
   const dbName = `inventory_management_${clientCode}`;
   const connectionString = process.env.MONGODB_URI.replace(/\/[^\/]*$/, `/${dbName}`);
   
-  return mongoose.createConnection(connectionString, {
+  const connection = mongoose.createConnection(connectionString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
+
+  // Store the connection
+  clientConnections.set(clientCode, connection);
+
+  // Clean up when connection closes
+  connection.on('close', () => {
+    clientConnections.delete(clientCode);
+  });
+
+  return connection;
 };
 
 const auth = async (req, res, next) => {
@@ -40,10 +58,17 @@ const auth = async (req, res, next) => {
         
         // Wait for connection to be ready
         await new Promise((resolve, reject) => {
-          clientConnection.once('open', resolve);
-          clientConnection.once('error', reject);
-          setTimeout(() => reject(new Error('Database connection timeout')), 5000);
+          if (clientConnection.readyState === 1) {
+            resolve();
+          } else {
+            clientConnection.once('open', resolve);
+            clientConnection.once('error', reject);
+            setTimeout(() => reject(new Error('Database connection timeout')), 5000);
+          }
         });
+
+        // Automatically setup client models
+        req.models = getClientModels(clientConnection);
       } catch (dbError) {
         return res.status(400).json({ 
           message: 'Invalid client code or database connection failed' 

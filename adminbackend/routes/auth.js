@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const InventorySetup = require('../models/InventorySetup');
 const { protect, adminOnly } = require('../middleware/auth');
 const { authLimiter } = require('../middleware/rateLimiter');
 
@@ -147,6 +148,19 @@ router.post('/login', [
     // Update last login
     await user.updateLastLogin();
 
+    // Try to get client code from inventory setup
+    let clientCode = null;
+    let inventorySetup = null;
+    
+    try {
+      inventorySetup = await InventorySetup.findOne({ email: user.email });
+      if (inventorySetup) {
+        clientCode = inventorySetup.clientCode;
+      }
+    } catch (setupError) {
+      console.log('No inventory setup found for user:', user.email);
+    }
+
     // Generate token
     const token = generateToken(user._id);
 
@@ -164,7 +178,16 @@ router.post('/login', [
           mobileNo: user.mobileNo,
           industry: user.industry,
           avatar: user.avatar
-        }
+        },
+        clientCode: clientCode,
+        inventorySetup: inventorySetup ? {
+          _id: inventorySetup._id,
+          clientCode: inventorySetup.clientCode,
+          databaseName: inventorySetup.databaseName,
+          setupStatus: inventorySetup.setupStatus,
+          subscriptionPlan: inventorySetup.subscriptionPlan,
+          subscriptionStatus: inventorySetup.subscriptionStatus
+        } : null
       }
     });
   } catch (error) {

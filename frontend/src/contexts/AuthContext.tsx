@@ -112,6 +112,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
       const userData = localStorage.getItem('user');
+      const clientCode = localStorage.getItem('clientCode');
 
       if (token && userData) {
         try {
@@ -120,7 +121,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           
           dispatch({
             type: 'LOGIN_SUCCESS',
-            payload: { user, token },
+            payload: { user, token, clientCode: clientCode || undefined },
           });
         } catch (error) {
           // If parsing fails or token is invalid, clear storage
@@ -143,16 +144,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Login with AdminBackend
       const response = await authAPI.login({ email, password });
-      const { user, token } = response.data.data; // Extract from response.data.data
+      const { user, token, clientCode, inventorySetup } = response.data.data;
 
       // Store basic auth data
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
+      
+      // Store client code if available
+      if (clientCode) {
+        localStorage.setItem('clientCode', clientCode);
+      }
 
-      // Skip inventory setup for now to simplify login
       dispatch({
         type: 'LOGIN_SUCCESS',
-        payload: { user, token },
+        payload: { user, token, clientCode, inventorySetup },
       });
       
     } catch (error: any) {

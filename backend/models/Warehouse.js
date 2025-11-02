@@ -57,4 +57,7 @@ warehouseSchema.index({ name: 1 });
 warehouseSchema.index({ code: 1 });
 warehouseSchema.index({ isActive: 1 });
 
-module.exports = mongoose.model('Warehouse', warehouseSchema);
+const Warehouse = mongoose.model('Warehouse', warehouseSchema);
+
+module.exports = Warehouse;
+module.exports.schema = warehouseSchema;
