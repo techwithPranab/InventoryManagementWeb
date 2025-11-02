@@ -20,6 +20,9 @@ const adminRoutes = require('./routes/admin');
 const pricingRoutes = require('./routes/pricing');
 const contactRoutes = require('./routes/contacts');
 
+// Import REST API routes
+const apiRoutes = require('./routes/api');
+
 // Load environment variables
 dotenv.config();
 
@@ -54,6 +57,9 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/contacts', contactRoutes);
 app.use('/api/pricing', pricingRoutes);
+
+// REST API routes for external systems (PAT token protected)
+app.use('/api', apiRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

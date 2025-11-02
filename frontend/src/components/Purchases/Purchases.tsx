@@ -67,7 +67,7 @@ const PurchaseMetrics: React.FC<{ onPeriodChange: (period: string) => void }> = 
   return (
     <Box mb={3}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6">Purchase Orders Overview</Typography>
+        <Typography variant="h5">Purchase Orders Overview</Typography>
         <FormControl size="small" sx={{ minWidth: 120 }}>
           <InputLabel>Period</InputLabel>
           <Select value={period} label="Period" onChange={(e) => handlePeriodChange(e.target.value)}>
@@ -83,25 +83,25 @@ const PurchaseMetrics: React.FC<{ onPeriodChange: (period: string) => void }> = 
         <Card sx={{ flex: '1 1 200px', minWidth: 200 }}>
           <CardContent>
             <Typography color="textSecondary" gutterBottom>Total Orders</Typography>
-            <Typography variant="h4">{overview.totalOrders || 0}</Typography>
+            <Typography variant="h5">{overview.totalOrders || 0}</Typography>
           </CardContent>
         </Card>
         <Card sx={{ flex: '1 1 200px', minWidth: 200 }}>
           <CardContent>
             <Typography color="textSecondary" gutterBottom>Pending Approval</Typography>
-            <Typography variant="h4" color="warning.main">{overview.pendingApproval || 0}</Typography>
+            <Typography variant="h5" color="warning.main">{overview.pendingApproval || 0}</Typography>
           </CardContent>
         </Card>
         <Card sx={{ flex: '1 1 200px', minWidth: 200 }}>
           <CardContent>
             <Typography color="textSecondary" gutterBottom>Total Amount</Typography>
-            <Typography variant="h4">₹{(overview.totalAmount || 0).toLocaleString()}</Typography>
+            <Typography variant="h5">₹{(overview.totalAmount || 0).toLocaleString()}</Typography>
           </CardContent>
         </Card>
         <Card sx={{ flex: '1 1 200px', minWidth: 200 }}>
           <CardContent>
             <Typography color="textSecondary" gutterBottom>Avg Order Value</Typography>
-            <Typography variant="h4">₹{(overview.avgOrderValue || 0).toFixed(0)}</Typography>
+            <Typography variant="h5">₹{(overview.avgOrderValue || 0).toFixed(0)}</Typography>
           </CardContent>
         </Card>
       </Box>
@@ -498,7 +498,7 @@ const Purchases: React.FC = () => {
       <PurchaseMetrics onPeriodChange={() => {}} />
       
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h4">Purchase Orders</Typography>
+        <Typography variant="h5">Purchase Orders</Typography>
         <Button variant="contained" startIcon={<AddIcon />} onClick={() => { setOpen(true); setEditing(null); }}>Add</Button>
       </Box>
       

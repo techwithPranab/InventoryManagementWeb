@@ -622,4 +622,141 @@ router.delete('/:id/pat-token', [
   }
 });
 
+// @desc    Validate PAT token (Public endpoint for backend service)
+// @route   POST /api/inventory-setup/validate-pat
+// @access  Public (No authentication required for backend service calls)
+router.post('/validate-pat', [
+  apiLimiter,
+  body('token')
+    .notEmpty()
+    .withMessage('PAT token is required')
+    .isLength({ min: 1 })
+    .withMessage('PAT token cannot be empty')
+], async (req, res, next) => {
+  try {
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        error: {
+          code: 'VALIDATION_ERROR',
+          details: 'PAT token is required'
+        }
+      });
+    }
+
+    const { token } = req.body;
+    const trimmedToken = token.trim();
+
+    if (!trimmedToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'PAT token cannot be empty',
+        error: {
+          code: 'AUTH_TOKEN_MISSING',
+          details: 'PAT token is required'
+        }
+      });
+    }
+
+    // Find inventory setup with matching PAT token
+    const inventorySetup = await InventorySetup.findOne({
+      'patToken.token': trimmedToken
+    });
+
+    if (!inventorySetup) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid PAT token',
+        error: {
+          code: 'AUTH_TOKEN_INVALID',
+          details: 'PAT token not found'
+        }
+      });
+    }
+
+    // Check if token is active
+    if (!inventorySetup.patToken.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: 'PAT token has been revoked',
+        error: {
+          code: 'AUTH_TOKEN_REVOKED',
+          details: 'This PAT token has been deactivated'
+        }
+      });
+    }
+
+    // Check if token has expired
+    const now = new Date();
+    if (now > inventorySetup.patToken.expiryDate) {
+      // Automatically deactivate expired token
+      inventorySetup.patToken.isActive = false;
+      await inventorySetup.save();
+
+      return res.status(401).json({
+        success: false,
+        message: 'PAT token has expired',
+        error: {
+          code: 'AUTH_TOKEN_EXPIRED',
+          details: `Token expired on ${inventorySetup.patToken.expiryDate}`
+        }
+      });
+    }
+
+    // Update lastUsedAt timestamp
+    inventorySetup.patToken.lastUsedAt = new Date();
+    await inventorySetup.save();
+
+    // Return client information
+    res.json({
+      success: true,
+      message: 'PAT token validated successfully',
+      data: {
+        client: {
+          _id: inventorySetup._id,
+          clientCode: inventorySetup.clientCode,
+          databaseName: inventorySetup.databaseName,
+          ownerName: inventorySetup.ownerName,
+          email: inventorySetup.email,
+          industry: inventorySetup.industry,
+          subscriptionPlan: inventorySetup.subscriptionPlan,
+          subscriptionStatus: inventorySetup.subscriptionStatus
+        },
+        patToken: {
+          token: trimmedToken,
+          expiryDate: inventorySetup.patToken.expiryDate,
+          createdAt: inventorySetup.patToken.createdAt,
+          lastUsedAt: inventorySetup.patToken.lastUsedAt
+        }
+      }
+    });
+  } catch (error) {
+    console.error('PAT validation error:', error);
+    
+    // Handle specific MongoDB errors
+    if (error.name === 'MongoError' || error.name === 'MongooseError') {
+      return res.status(500).json({
+        success: false,
+        message: 'Database error during authentication',
+        error: {
+          code: 'DATABASE_ERROR',
+          details: 'Unable to validate PAT token'
+        }
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error during authentication',
+      error: {
+        code: 'INTERNAL_ERROR',
+        details: 'Authentication service unavailable'
+      }
+    });
+  }
+});
+
 module.exports = router;

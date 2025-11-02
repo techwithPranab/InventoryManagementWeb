@@ -133,7 +133,7 @@ const UserManagement: React.FC = () => {
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h4">User Management</Typography>
+        <Typography variant="h5">User Management</Typography>
         {user?.role === 'admin' && (
           <Button variant="contained" onClick={() => { setOpen(true); setEditing(null); }}>Add User</Button>
         )}

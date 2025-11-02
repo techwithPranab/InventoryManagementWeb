@@ -544,7 +544,7 @@ const InventoryManagement: React.FC = () => {
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box>
-          <Typography variant="h4" fontWeight="700" gutterBottom color="#212529">
+          <Typography variant="h5" fontWeight="700" gutterBottom color="#212529">
             Inventory Management System
           </Typography>
           <Typography variant="body1" color="#6c757d" fontWeight="500">
@@ -595,7 +595,7 @@ const InventoryManagement: React.FC = () => {
             <Box display="flex" alignItems="center">
               <InventoryIcon color="primary" sx={{ fontSize: 40, mr: 2 }} />
               <Box>
-                <Typography variant="h4" fontWeight="bold">
+                <Typography variant="h5" fontWeight="bold">
                   {summary.totalProducts?.toLocaleString() || 0}
                 </Typography>
                 <Typography color="textSecondary" variant="body2">
@@ -611,7 +611,7 @@ const InventoryManagement: React.FC = () => {
             <Box display="flex" alignItems="center">
               <CheckCircleIcon color="success" sx={{ fontSize: 40, mr: 2 }} />
               <Box>
-                <Typography variant="h4" fontWeight="bold">
+                <Typography variant="h5" fontWeight="bold">
                   {summary.totalQuantity?.toLocaleString() || 0}
                 </Typography>
                 <Typography color="textSecondary" variant="body2">
@@ -627,7 +627,7 @@ const InventoryManagement: React.FC = () => {
             <Box display="flex" alignItems="center">
               <MoneyIcon color="info" sx={{ fontSize: 40, mr: 2 }} />
               <Box>
-                <Typography variant="h4" fontWeight="bold">
+                <Typography variant="h5" fontWeight="bold">
                   {formatCurrency(summary.totalValue || 0)}
                 </Typography>
                 <Typography color="textSecondary" variant="body2">
@@ -643,7 +643,7 @@ const InventoryManagement: React.FC = () => {
             <Box display="flex" alignItems="center">
               <WarningIcon color="warning" sx={{ fontSize: 40, mr: 2 }} />
               <Box>
-                <Typography variant="h4" fontWeight="bold">
+                <Typography variant="h5" fontWeight="bold">
                   {summary.lowStockItems || 0}
                 </Typography>
                 <Typography color="textSecondary" variant="body2">
@@ -659,7 +659,7 @@ const InventoryManagement: React.FC = () => {
             <Box display="flex" alignItems="center">
               <ErrorIcon color="error" sx={{ fontSize: 40, mr: 2 }} />
               <Box>
-                <Typography variant="h4" fontWeight="bold">
+                <Typography variant="h5" fontWeight="bold">
                   {summary.outOfStockItems || 0}
                 </Typography>
                 <Typography color="textSecondary" variant="body2">
@@ -997,7 +997,7 @@ const InventoryManagement: React.FC = () => {
               <Typography variant="h6" gutterBottom>
                 Total Valuation
               </Typography>
-              <Typography variant="h4" color="primary" fontWeight="bold">
+              <Typography variant="h5" color="primary" fontWeight="bold">
                 {formatCurrency(valuation.totalValue || 0)}
               </Typography>
               <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
@@ -1011,7 +1011,7 @@ const InventoryManagement: React.FC = () => {
               <Typography variant="h6" gutterBottom>
                 Available Value
               </Typography>
-              <Typography variant="h4" color="success.main" fontWeight="bold">
+              <Typography variant="h5" color="success.main" fontWeight="bold">
                 {formatCurrency(valuation.availableValue || 0)}
               </Typography>
               <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
@@ -1025,7 +1025,7 @@ const InventoryManagement: React.FC = () => {
               <Typography variant="h6" gutterBottom>
                 Reserved Value
               </Typography>
-              <Typography variant="h4" color="warning.main" fontWeight="bold">
+              <Typography variant="h5" color="warning.main" fontWeight="bold">
                 {formatCurrency(valuation.reservedValue || 0)}
               </Typography>
               <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>

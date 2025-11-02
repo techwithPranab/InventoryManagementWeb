@@ -196,7 +196,7 @@ function StatusChip({ status }: { status: string }) {
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h4">Shipping Management</Typography>
+        <Typography variant="h5">Shipping Management</Typography>
         <Button variant="contained" onClick={() => { setOpen(true); setEditing(null); }}>Add Shipping</Button>
       </Box>
 

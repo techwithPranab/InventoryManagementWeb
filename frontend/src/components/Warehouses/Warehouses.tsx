@@ -463,7 +463,7 @@ const Warehouses: React.FC = () => {
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box>
-          <Typography variant="h4" fontWeight="700" gutterBottom color="#212529">
+          <Typography variant="h5" fontWeight="700" gutterBottom color="#212529">
             Multi-Warehouse Inventory Management
           </Typography>
           <Typography variant="body1" color="#6c757d" fontWeight="500">
@@ -498,7 +498,7 @@ const Warehouses: React.FC = () => {
                 <Box display="flex" alignItems="center">
                   <WarehouseIcon color="primary" sx={{ fontSize: 40, mr: 2 }} />
                   <Box>
-                    <Typography variant="h4" fontWeight="bold">
+                    <Typography variant="h5" fontWeight="bold">
                       {totalCount}
                     </Typography>
                     <Typography color="textSecondary" variant="body2">
@@ -513,7 +513,7 @@ const Warehouses: React.FC = () => {
                 <Box display="flex" alignItems="center">
                   <InventoryIcon color="success" sx={{ fontSize: 40, mr: 2 }} />
                   <Box>
-                    <Typography variant="h4" fontWeight="bold">
+                    <Typography variant="h5" fontWeight="bold">
                       {filteredWarehouses.reduce((sum: number, wh: Warehouse) => 
                         sum + (wh.inventoryStats?.totalProducts || 0), 0)}
                     </Typography>
@@ -529,7 +529,7 @@ const Warehouses: React.FC = () => {
                 <Box display="flex" alignItems="center">
                   <TrendingUpIcon color="info" sx={{ fontSize: 40, mr: 2 }} />
                   <Box>
-                    <Typography variant="h4" fontWeight="bold">
+                    <Typography variant="h5" fontWeight="bold">
                       {Math.round(filteredWarehouses.reduce((sum: number, wh: Warehouse) => 
                         sum + (wh.occupancyPercentage || 0), 0) / (filteredWarehouses.length || 1))}%
                     </Typography>
@@ -545,7 +545,7 @@ const Warehouses: React.FC = () => {
                 <Box display="flex" alignItems="center">
                   <TransferIcon color="warning" sx={{ fontSize: 40, mr: 2 }} />
                   <Box>
-                    <Typography variant="h4" fontWeight="bold">
+                    <Typography variant="h5" fontWeight="bold">
                       {transfers?.transfers?.filter((t: Transfer) => t.status === 'pending').length || 0}
                     </Typography>
                     <Typography color="textSecondary" variant="body2">

@@ -231,7 +231,7 @@ const Categories: React.FC = () => {
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box>
-          <Typography variant="h4" fontWeight="700" gutterBottom color="#212529">
+          <Typography variant="h5" fontWeight="700" gutterBottom color="#212529">
             Category Management
           </Typography>
           <Typography variant="body1" color="#6c757d" fontWeight="500">
@@ -252,7 +252,7 @@ const Categories: React.FC = () => {
             <Box display="flex" alignItems="center">
               <CategoryIcon color="primary" sx={{ fontSize: 40, mr: 2 }} />
               <Box>
-                <Typography variant="h4" fontWeight="bold">
+                <Typography variant="h5" fontWeight="bold">
                   {totalCount}
                 </Typography>
                 <Typography color="textSecondary" variant="body2">
@@ -267,7 +267,7 @@ const Categories: React.FC = () => {
             <Box display="flex" alignItems="center">
               <InventoryIcon color="success" sx={{ fontSize: 40, mr: 2 }} />
               <Box>
-                <Typography variant="h4" fontWeight="bold">
+                <Typography variant="h5" fontWeight="bold">
                   {filteredCategories.reduce((sum: number, cat: Category) => sum + (cat.productCount || 0), 0)}
                 </Typography>
                 <Typography color="textSecondary" variant="body2">

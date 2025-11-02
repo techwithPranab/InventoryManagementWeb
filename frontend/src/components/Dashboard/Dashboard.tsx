@@ -32,7 +32,6 @@ import { useQuery } from '@tanstack/react-query';
 import { dashboardAPI } from '../../services/api';
 import LoadingSpinner from '../Common/LoadingSpinner';
 import { useAuth } from '../../contexts/AuthContext';
-import PATTokenDialog from './PATTokenDialog';
 
 interface OverviewCardProps {
   title: string;
@@ -62,7 +61,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
             <Typography color="textSecondary" gutterBottom variant="body2">
               {title}
             </Typography>
-            <Typography variant="h4" component="div" fontWeight="bold">
+            <Typography variant="h5" component="div" fontWeight="bold">
               {value}
             </Typography>
             {subtitle && (
@@ -198,7 +197,7 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
+          <Typography variant="h5" fontWeight="bold" gutterBottom>
             Dashboard
           </Typography>
           <Typography variant="body1" color="textSecondary">
@@ -462,16 +461,7 @@ const Dashboard: React.FC = () => {
           </Card>
         </Box>
       </Box>
-
-      {/* PAT Token Dialog */}
-      {inventorySetupId && clientCode && (
-        <PATTokenDialog
-          open={patDialogOpen}
-          onClose={() => setPATDialogOpen(false)}
-          clientCode={clientCode}
-          inventorySetupId={inventorySetupId}
-        />
-      )}
+    {/* PAT Token Dialog */}
     </Box>
   );
 };

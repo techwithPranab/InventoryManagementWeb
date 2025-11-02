@@ -320,7 +320,7 @@ const Products: React.FC = () => {
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box>
-          <Typography variant="h4" fontWeight="700" gutterBottom color="#212529">
+          <Typography variant="h5" fontWeight="700" gutterBottom color="#212529">
             Product Management
           </Typography>
           <Typography variant="body1" color="#6c757d" fontWeight="500">
