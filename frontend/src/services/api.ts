@@ -140,12 +140,44 @@ export const categoriesAPI = {
 export const productsAPI = {
   getAll: (params?: any) => api.get('/products', { params }),
   getById: (id: string) => api.get(`/products/${id}`),
-  create: (data: any) => api.post('/products', data),
-  update: (id: string, data: any) => api.put(`/products/${id}`, data),
+  create: (data: any) => {
+    // Check if data contains files (images)
+    if (data instanceof FormData) {
+      return api.post('/products', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    }
+    return api.post('/products', data);
+  },
+  update: (id: string, data: any) => {
+    // Check if data contains files (images)
+    if (data instanceof FormData) {
+      return api.put(`/products/${id}`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    }
+    return api.put(`/products/${id}`, data);
+  },
   delete: (id: string) => api.delete(`/products/${id}`),
   getLowStock: (params?: any) => api.get('/products/reports/low-stock', { params }),
   search: (query: string, limit?: number) => 
     api.get('/products/search/text', { params: { q: query, limit } }),
+  
+  // Image management
+  addImages: (slug: string, formData: FormData) =>
+    api.post(`/products/${slug}/images`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
+  removeImage: (slug: string, imageId: string) =>
+    api.delete(`/products/${slug}/images/${imageId}`),
+  reorderImages: (slug: string, imageOrder: string[]) =>
+    api.put(`/products/${slug}/images/reorder`, { imageOrder }),
 };
 
 // Warehouses API

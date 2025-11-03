@@ -1,6 +1,8 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { auth, authorize, requireClientCode } = require('../middleware/auth');
+const { upload, deleteImage, extractPublicId, generateResponsiveUrls } = require('../config/cloudinary');
+const { generateProductSlug } = require('../utils/imageUtils');
 
 const router = express.Router();
 
@@ -103,6 +105,14 @@ router.post('/', [
   auth,
   requireClientCode,
   authorize('admin', 'manager', 'staff'),
+  (req, res, next) => {
+    // Set product slug before multer processes files
+    if (req.body.name || req.body.sku) {
+      req.body.productSlug = generateProductSlug(req.body.name, req.body.sku);
+    }
+    next();
+  },
+  upload.array('productImages', 10), // Handle up to 10 images
   body('name').trim().notEmpty().withMessage('Product name is required'),
   body('sku').trim().notEmpty().withMessage('SKU is required'),
   body('category').notEmpty().withMessage('Category is required'),
@@ -124,8 +134,32 @@ router.post('/', [
     const {
       name, sku, description, category, brand, unit,
       costPrice, sellingPrice, minStockLevel, maxStockLevel,
-      reorderLevel, images, barcode, weight, dimensions
+      reorderLevel, barcode, weight, dimensions
     } = req.body;
+
+    // Handle images from multer upload
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      images = req.files.map(file => ({
+        url: file.path,
+        publicId: file.filename,
+        originalName: file.originalname,
+        size: file.size,
+        responsiveUrls: generateResponsiveUrls(file.filename)
+      }));
+    }
+
+    // Handle additional images from request body (if any)
+    if (req.body.additionalImages) {
+      try {
+        const additionalImages = JSON.parse(req.body.additionalImages);
+        if (Array.isArray(additionalImages)) {
+          images = [...images, ...additionalImages];
+        }
+      } catch (error) {
+        console.error('Error parsing additional images:', error);
+      }
+    }
 
     // Check if category exists
     const categoryExists = await Category.findById(category);
@@ -153,6 +187,7 @@ router.post('/', [
     const product = new Product({
       name,
       sku: sku.toUpperCase(),
+      slug: req.body.productSlug || generateProductSlug(name, sku),
       description,
       category,
       brand,
@@ -192,6 +227,7 @@ router.put('/:id', [
   auth,
   requireClientCode,
   authorize('admin', 'manager', 'staff'),
+  upload.array('productImages', 10), // Handle up to 10 new images
   body('name').optional().trim().notEmpty().withMessage('Product name cannot be empty'),
   body('sku').optional().trim().notEmpty().withMessage('SKU cannot be empty'),
   body('costPrice').optional().isNumeric().withMessage('Cost price must be a number'),
@@ -210,6 +246,60 @@ router.put('/:id', [
     }
 
     const updateFields = { ...req.body };
+    
+    // Handle new images from multer upload
+    if (req.files && req.files.length > 0) {
+      const newImages = req.files.map(file => ({
+        url: file.path,
+        publicId: file.filename,
+        originalName: file.originalname,
+        size: file.size,
+        responsiveUrls: generateResponsiveUrls(file.filename)
+      }));
+
+      // Get existing product to merge images
+      const existingProduct = await Product.findById(req.params.id);
+      if (existingProduct) {
+        updateFields.images = [...(existingProduct.images || []), ...newImages];
+      } else {
+        updateFields.images = newImages;
+      }
+    }
+
+    // Handle image removal (if specified in request)
+    if (req.body.removeImages) {
+      try {
+        const removeImages = JSON.parse(req.body.removeImages);
+        if (Array.isArray(removeImages) && removeImages.length > 0) {
+          const existingProduct = await Product.findById(req.params.id);
+          if (existingProduct && existingProduct.images) {
+            // Remove images from Cloudinary
+            const deletePromises = removeImages.map(async (imageId) => {
+              const imageToRemove = existingProduct.images.find(img => 
+                img._id.toString() === imageId || img.publicId === imageId
+              );
+              if (imageToRemove && imageToRemove.publicId) {
+                try {
+                  await deleteImage(imageToRemove.publicId);
+                } catch (error) {
+                  console.error('Error deleting image from Cloudinary:', error);
+                }
+              }
+            });
+            
+            await Promise.allSettled(deletePromises);
+            
+            // Filter out removed images
+            updateFields.images = existingProduct.images.filter(img => 
+              !removeImages.includes(img._id.toString()) && 
+              !removeImages.includes(img.publicId)
+            );
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing removeImages:', error);
+      }
+    }
     
     if (updateFields.sku) {
       updateFields.sku = updateFields.sku.toUpperCase();
@@ -292,11 +382,28 @@ router.delete('/:id', [auth, requireClientCode, authorize('admin')], async (req,
       });
     }
 
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const product = await Product.findById(req.params.id);
 
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+
+    // Delete images from Cloudinary
+    if (product.images && product.images.length > 0) {
+      const deleteImagePromises = product.images.map(async (image) => {
+        if (image.publicId) {
+          try {
+            await deleteImage(image.publicId);
+          } catch (error) {
+            console.error('Error deleting image from Cloudinary:', error);
+          }
+        }
+      });
+      
+      await Promise.allSettled(deleteImagePromises);
+    }
+
+    await Product.findByIdAndDelete(req.params.id);
 
     // Clean up any zero inventory records
     await Inventory.deleteMany({ product: req.params.id });
@@ -396,6 +503,287 @@ router.get('/search/text', [auth, requireClientCode], async (req, res) => {
     res.json({ products });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Test route to debug middleware
+router.post('/:id/test-upload', [
+  auth,
+  requireClientCode,
+  authorize('admin', 'manager', 'staff')
+], async (req, res) => {
+  console.log('=== Test Upload Route ===');
+  console.log('Product ID:', req.params.id);
+  console.log('Headers:', req.headers);
+  console.log('Body:', req.body);
+  console.log('Models available:', !!req.models);
+  
+  try {
+    const { Product } = req.models;
+    const product = await Product.findById(req.params.id);
+    
+    res.json({
+      message: 'Test successful',
+      productFound: !!product,
+      productName: product?.name || 'N/A'
+    });
+  } catch (error) {
+    console.error('Test route error:', error);
+    res.status(500).json({ message: 'Test failed', error: error.message });
+  }
+});
+
+// @route   POST /api/products/:slug/images
+// @desc    Add images to existing product
+// @access  Private (Admin/Manager/Staff)
+router.post('/:slug/images', [
+  auth,
+  requireClientCode,
+  authorize('admin', 'manager', 'staff'),
+  (req, res, next) => {
+    console.log('=== Before Multer Middleware ===');
+    console.log('Request received for product slug:', req.params.slug);
+    next();
+  },
+  upload.array('productImages', 10),
+  (err, req, res, next) => {
+    console.log('=== Multer Error Handler ===');
+    if (err) {
+      console.error('Multer error:', err);
+      return res.status(400).json({ 
+        message: 'File upload error', 
+        error: err.message 
+      });
+    }
+    next();
+  }
+], async (req, res) => {
+  console.log('=== Image Upload Handler Started ===');
+  console.log('Product Slug:', req.params.slug);
+  console.log('Files received:', req.files ? req.files.length : 'none');
+  console.log('Body:', req.body);
+  
+  try {
+    const { Product } = req.models;
+    console.log('Product model available:', !!Product);
+    
+    if (!req.files || req.files.length === 0) {
+      console.log('No files uploaded, sending 400 response');
+      return res.status(400).json({ message: 'No images uploaded' });
+    }
+
+    console.log('Looking up product by slug:', req.params.slug);
+    let product = await Product.findOne({ slug: req.params.slug });
+    
+    // If no product found by slug, try to find by ID (for backward compatibility)
+    if (!product) {
+      console.log('Product not found by slug, trying by ID...');
+      product = await Product.findById(req.params.slug);
+      if (product && !product.slug) {
+        // Generate and save slug for existing product
+        const slug = generateProductSlug(product.name, product.sku);
+        product.slug = slug;
+        await product.save();
+        console.log('Generated slug for existing product:', slug);
+      }
+    }
+    
+    if (!product) {
+      console.log('Product not found, sending 404 response');
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    console.log('Product found:', product.name);
+    console.log('Processing files...');
+    
+    const newImages = req.files.map((file, index) => {
+      console.log(`Processing file ${index + 1}:`, file.originalname);
+      let responsiveUrls;
+      try {
+        responsiveUrls = generateResponsiveUrls(file.filename);
+        console.log('Generated responsive URLs successfully');
+      } catch (error) {
+        console.error('Error generating responsive URLs:', error);
+        // Fallback to basic URL
+        const baseUrl = file.path;
+        responsiveUrls = {
+          thumbnail: baseUrl,
+          small: baseUrl,
+          medium: baseUrl,
+          large: baseUrl,
+          original: baseUrl
+        };
+        console.log('Using fallback URLs');
+      }
+      
+      return {
+        url: file.path,
+        publicId: file.filename,
+        originalName: file.originalname,
+        size: file.size,
+        responsiveUrls: responsiveUrls
+      };
+    });
+
+    console.log('Saving product with new images...');
+    product.images = [...(product.images || []), ...newImages];
+    await product.save();
+    console.log('Product saved successfully');
+
+    const response = {
+      message: 'Images added successfully',
+      images: newImages,
+      totalImages: product.images.length
+    };
+    
+    console.log('Sending success response:', JSON.stringify(response, null, 2));
+    return res.json(response);
+  } catch (error) {
+    console.error('=== Image upload error ===');
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    
+    if (error.name === 'CastError') {
+      console.log('Sending 400 response for CastError');
+      return res.status(400).json({ message: 'Invalid product ID' });
+    }
+    
+    console.log('Sending 500 response for general error');
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// @route   DELETE /api/products/:slug/images/:imageId
+// @desc    Remove specific image from product
+// @access  Private (Admin/Manager/Staff)
+router.delete('/:slug/images/:imageId', [
+  auth,
+  requireClientCode,
+  authorize('admin', 'manager', 'staff')
+], async (req, res) => {
+  try {
+    const { Product } = req.models;
+    
+    let product = await Product.findOne({ slug: req.params.slug });
+    
+    // If no product found by slug, try to find by ID (for backward compatibility)
+    if (!product) {
+      product = await Product.findById(req.params.slug);
+      if (product && !product.slug) {
+        // Generate and save slug for existing product
+        const slug = generateProductSlug(product.name, product.sku);
+        product.slug = slug;
+        await product.save();
+      }
+    }
+    
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    const imageToRemove = product.images.find(img => 
+      img._id.toString() === req.params.imageId
+    );
+
+    if (!imageToRemove) {
+      return res.status(404).json({ message: 'Image not found' });
+    }
+
+    // Delete from Cloudinary
+    if (imageToRemove.publicId) {
+      try {
+        await deleteImage(imageToRemove.publicId);
+      } catch (error) {
+        console.error('Error deleting image from Cloudinary:', error);
+      }
+    }
+
+    // Remove from product
+    product.images = product.images.filter(img => 
+      img._id.toString() !== req.params.imageId
+    );
+
+    await product.save();
+
+    res.json({
+      message: 'Image removed successfully',
+      remainingImages: product.images.length
+    });
+  } catch (error) {
+    console.error(error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid product or image ID' });
+    }
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   PUT /api/products/:slug/images/reorder
+// @desc    Reorder product images
+// @access  Private (Admin/Manager/Staff)
+router.put('/:slug/images/reorder', [
+  auth,
+  requireClientCode,
+  authorize('admin', 'manager', 'staff'),
+  body('imageOrder').isArray().withMessage('Image order must be an array')
+], async (req, res) => {
+  try {
+    const { Product } = req.models;
+    
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        message: 'Validation failed', 
+        errors: errors.array() 
+      });
+    }
+
+    let product = await Product.findOne({ slug: req.params.slug });
+    
+    // If no product found by slug, try to find by ID (for backward compatibility)
+    if (!product) {
+      product = await Product.findById(req.params.slug);
+      if (product && !product.slug) {
+        // Generate and save slug for existing product
+        const slug = generateProductSlug(product.name, product.sku);
+        product.slug = slug;
+        await product.save();
+      }
+    }
+    
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    const { imageOrder } = req.body;
+    
+    // Validate that all image IDs in the order exist
+    const imageIds = product.images.map(img => img._id.toString());
+    const validOrder = imageOrder.every(id => imageIds.includes(id));
+    
+    if (!validOrder || imageOrder.length !== product.images.length) {
+      return res.status(400).json({ message: 'Invalid image order' });
+    }
+
+    // Reorder images
+    const reorderedImages = imageOrder.map(id => 
+      product.images.find(img => img._id.toString() === id)
+    );
+
+    product.images = reorderedImages;
+    await product.save();
+
+    res.json({
+      message: 'Images reordered successfully',
+      images: product.images
+    });
+  } catch (error) {
+    console.error(error);
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid product ID' });
+    }
     res.status(500).json({ message: 'Server error' });
   }
 });

@@ -13,6 +13,11 @@ const productSchema = new mongoose.Schema({
     uppercase: true,
     trim: true
   },
+  slug: {
+    type: String,
+    unique: true,
+    trim: true
+  },
   description: {
     type: String,
     trim: true
@@ -58,7 +63,27 @@ const productSchema = new mongoose.Schema({
     min: 0
   },
   images: [{
-    type: String
+    url: {
+      type: String,
+      required: true
+    },
+    publicId: {
+      type: String,
+      required: true
+    },
+    originalName: String,
+    size: Number,
+    responsiveUrls: {
+      thumbnail: String,
+      small: String,
+      medium: String,
+      large: String,
+      original: String
+    },
+    uploadedAt: {
+      type: Date,
+      default: Date.now
+    }
   }],
   barcode: {
     type: String,

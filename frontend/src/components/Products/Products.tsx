@@ -29,6 +29,8 @@ import {
   InputLabel,
   Select,
   Avatar,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -40,15 +42,35 @@ import {
   TrendingUp as TrendingUpIcon,
   Warning as WarningIcon,
   CheckCircle as CheckCircleIcon,
+  Info as InfoIcon,
+  Image as ImageIcon,
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productsAPI, categoriesAPI } from '../../services/api';
 import LoadingSpinner from '../Common/LoadingSpinner';
+import ProductImageManager from '../ProductImageManager';
+
+interface ProductImage {
+  _id: string;
+  url: string;
+  publicId: string;
+  originalName: string;
+  size: number;
+  responsiveUrls: {
+    thumbnail: string;
+    small: string;
+    medium: string;
+    large: string;
+    original: string;
+  };
+  uploadedAt: string;
+}
 
 interface Product {
   _id: string;
   name: string;
   sku: string;
+  slug: string;
   description: string;
   category: {
     _id: string;
@@ -61,6 +83,7 @@ interface Product {
   minStockLevel: number;
   maxStockLevel: number;
   reorderLevel: number;
+  images: ProductImage[];
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -85,6 +108,28 @@ interface ProductFormData {
   reorderLevel: number | string;
 }
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`product-tabpanel-${index}`}
+      aria-labelledby={`product-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box>{children}</Box>}
+    </div>
+  );
+}
+
 const Products: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -96,6 +141,8 @@ const Products: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [tabValue, setTabValue] = useState(0);
+  const [productImages, setProductImages] = useState<ProductImage[]>([]);
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     sku: '',
@@ -142,7 +189,7 @@ const Products: React.FC = () => {
 
   // Create product mutation
   const createMutation = useMutation({
-    mutationFn: (data: ProductFormData) => productsAPI.create(data),
+    mutationFn: (data: FormData | ProductFormData) => productsAPI.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       handleCloseDialog();
@@ -151,7 +198,7 @@ const Products: React.FC = () => {
 
   // Update product mutation
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: ProductFormData }) =>
+    mutationFn: ({ id, data }: { id: string; data: FormData | ProductFormData }) =>
       productsAPI.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -172,6 +219,7 @@ const Products: React.FC = () => {
   const handleOpenDialog = (product?: Product) => {
     if (product) {
       setEditingProduct(product);
+      setProductImages(product.images || []);
       setFormData({
         name: product.name,
         sku: product.sku,
@@ -187,6 +235,7 @@ const Products: React.FC = () => {
       });
     } else {
       setEditingProduct(null);
+      setProductImages([]);
       setFormData({
         name: '',
         sku: '',
@@ -202,12 +251,15 @@ const Products: React.FC = () => {
       });
     }
     setFormErrors({});
+    setTabValue(0);
     setOpen(true);
   };
 
   const handleCloseDialog = () => {
     setOpen(false);
     setEditingProduct(null);
+    setProductImages([]);
+    setTabValue(0);
     setFormErrors({});
   };
 
@@ -229,7 +281,34 @@ const Products: React.FC = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const createFormData = (productData: any, imageFiles?: File[]): FormData => {
+    const formData = new FormData();
+    
+    // Add product data
+    Object.keys(productData).forEach(key => {
+      formData.append(key, productData[key]);
+    });
+
+    // Add product slug for image organization
+    if (productData.name && productData.sku) {
+      const slug = `${productData.name}-${productData.sku}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-');
+      formData.append('productSlug', slug);
+    }
+
+    // Add image files if any
+    if (imageFiles && imageFiles.length > 0) {
+      imageFiles.forEach(file => {
+        formData.append('productImages', file);
+      });
+    }
+
+    return formData;
+  };
+
+  const handleSubmit = (imageFiles?: File[]) => {
     if (!validateForm()) return;
 
     const submitData = {
@@ -241,13 +320,18 @@ const Products: React.FC = () => {
       reorderLevel: Number(formData.reorderLevel),
     };
 
+    // Use FormData if we have image files, otherwise send JSON
+    const finalData = imageFiles && imageFiles.length > 0 
+      ? createFormData(submitData, imageFiles)
+      : submitData;
+
     if (editingProduct) {
       updateMutation.mutate({
         id: editingProduct._id,
-        data: submitData,
+        data: finalData,
       });
     } else {
-      createMutation.mutate(submitData);
+      createMutation.mutate(finalData);
     }
   };
 
@@ -529,7 +613,10 @@ const Products: React.FC = () => {
                 <TableRow key={product._id} hover sx={{ '&:hover': { bgcolor: '#f8f9fa' } }}>
                   <TableCell sx={{ borderBottom: '1px solid #f1f3f4' }}>
                     <Box display="flex" alignItems="center">
-                      <Avatar sx={{ mr: 2, bgcolor: '#495057', width: 36, height: 36 }}>
+                      <Avatar 
+                        sx={{ mr: 2, width: 36, height: 36 }}
+                        src={product.images?.[0]?.responsiveUrls?.thumbnail}
+                      >
                         <Typography variant="body2" fontWeight="600">
                           {product.name.charAt(0).toUpperCase()}
                         </Typography>
@@ -687,7 +774,7 @@ const Products: React.FC = () => {
       <Dialog 
         open={open} 
         onClose={handleCloseDialog} 
-        maxWidth="md" 
+        maxWidth="lg" 
         fullWidth
         slotProps={{
           paper: {
@@ -703,215 +790,259 @@ const Products: React.FC = () => {
           bgcolor: '#f8f9fa', 
           borderBottom: '1px solid #dee2e6',
           color: '#212529',
-          fontWeight: 600
+          fontWeight: 600,
+          pb: 0
         }}>
           {editingProduct ? 'Edit Product' : 'Add New Product'}
+          <Tabs
+            value={tabValue}
+            onChange={(e, newValue) => setTabValue(newValue)}
+            sx={{ mt: 2 }}
+          >
+            <Tab 
+              icon={<InfoIcon />} 
+              label="Product Details" 
+              iconPosition="start"
+              sx={{ textTransform: 'none' }}
+            />
+            <Tab 
+              icon={<ImageIcon />} 
+              label="Images" 
+              iconPosition="start"
+              sx={{ textTransform: 'none' }}
+            />
+          </Tabs>
         </DialogTitle>
         <DialogContent sx={{ bgcolor: '#ffffff', py: 3 }}>
-          <Box sx={{ pt: 1 }}>
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 2 }}>
-              <TextField
-                fullWidth
-                label="Product Name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                error={!!formErrors.name}
-                helperText={formErrors.name}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: '#dee2e6' },
-                    '&:hover fieldset': { borderColor: '#495057' },
-                    '&.Mui-focused fieldset': { borderColor: '#495057' }
-                  }
-                }}
-              />
-              <TextField
-                fullWidth
-                label="SKU"
-                value={formData.sku}
-                onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                error={!!formErrors.sku}
-                helperText={formErrors.sku}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: '#dee2e6' },
-                    '&:hover fieldset': { borderColor: '#495057' },
-                    '&.Mui-focused fieldset': { borderColor: '#495057' }
-                  }
-                }}
-              />
-            </Box>
-            
-            <TextField
-              fullWidth
-              label="Description"
-              multiline
-              rows={3}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              error={!!formErrors.description}
-              helperText={formErrors.description}
-              sx={{ 
-                mb: 2,
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: '#dee2e6' },
-                  '&:hover fieldset': { borderColor: '#495057' },
-                  '&.Mui-focused fieldset': { borderColor: '#495057' }
-                }
-              }}
-            />
-
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mb: 2 }}>
-              <FormControl fullWidth error={!!formErrors.category}>
-                <InputLabel>Category</InputLabel>
-                <Select
-                  value={formData.category}
-                  label="Category"
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+          <TabPanel value={tabValue} index={0}>
+            <Box sx={{ pt: 1 }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 2 }}>
+                <TextField
+                  fullWidth
+                  label="Product Name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  error={!!formErrors.name}
+                  helperText={formErrors.name}
                   sx={{
-                    '& .MuiOutlinedInput-notchedOutline': { borderColor: '#dee2e6' },
-                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#495057' },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#495057' }
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: '#dee2e6' },
+                      '&:hover fieldset': { borderColor: '#495057' },
+                      '&.Mui-focused fieldset': { borderColor: '#495057' }
+                    }
                   }}
-                >
-                  {categoryOptions.map((category: Category) => (
-                    <MenuItem key={category._id} value={category._id}>
-                      {category.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              
-              <TextField
-                fullWidth
-                label="Brand"
-                value={formData.brand}
-                onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                error={!!formErrors.brand}
-                helperText={formErrors.brand}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: '#dee2e6' },
-                    '&:hover fieldset': { borderColor: '#495057' },
-                    '&.Mui-focused fieldset': { borderColor: '#495057' }
-                  }
-                }}
-              />
-
-              <FormControl fullWidth>
-                <InputLabel>Unit</InputLabel>
-                <Select
-                  value={formData.unit}
-                  label="Unit"
-                  onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                />
+                <TextField
+                  fullWidth
+                  label="SKU"
+                  value={formData.sku}
+                  onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                  error={!!formErrors.sku}
+                  helperText={formErrors.sku}
                   sx={{
-                    '& .MuiOutlinedInput-notchedOutline': { borderColor: '#dee2e6' },
-                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#495057' },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#495057' }
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: '#dee2e6' },
+                      '&:hover fieldset': { borderColor: '#495057' },
+                      '&.Mui-focused fieldset': { borderColor: '#495057' }
+                    }
                   }}
-                >
-                  <MenuItem value="piece">Piece</MenuItem>
-                  <MenuItem value="kg">Kilogram</MenuItem>
-                  <MenuItem value="liter">Liter</MenuItem>
-                  <MenuItem value="meter">Meter</MenuItem>
-                  <MenuItem value="box">Box</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
+                />
+              </Box>
+              
+              <TextField
+                fullWidth
+                label="Description"
+                multiline
+                rows={3}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                error={!!formErrors.description}
+                helperText={formErrors.description}
+                sx={{ 
+                  mb: 2,
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: '#dee2e6' },
+                    '&:hover fieldset': { borderColor: '#495057' },
+                    '&.Mui-focused fieldset': { borderColor: '#495057' }
+                  }
+                }}
+              />
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 2 }}>
-              <TextField
-                fullWidth
-                label="Cost Price"
-                type="number"
-                value={formData.costPrice}
-                onChange={(e) => setFormData({ ...formData, costPrice: e.target.value })}
-                error={!!formErrors.costPrice}
-                helperText={formErrors.costPrice}
-                slotProps={{
-                  input: {
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>
-                  }
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: '#dee2e6' },
-                    '&:hover fieldset': { borderColor: '#495057' },
-                    '&.Mui-focused fieldset': { borderColor: '#495057' }
-                  }
-                }}
-              />
-              
-              <TextField
-                fullWidth
-                label="Selling Price"
-                type="number"
-                value={formData.sellingPrice}
-                onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value })}
-                error={!!formErrors.sellingPrice}
-                helperText={formErrors.sellingPrice}
-                slotProps={{
-                  input: {
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>
-                  }
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: '#dee2e6' },
-                    '&:hover fieldset': { borderColor: '#495057' },
-                    '&.Mui-focused fieldset': { borderColor: '#495057' }
-                  }
-                }}
-              />
-            </Box>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mb: 2 }}>
+                <FormControl fullWidth error={!!formErrors.category}>
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    value={formData.category}
+                    label="Category"
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    sx={{
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: '#dee2e6' },
+                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#495057' },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#495057' }
+                    }}
+                  >
+                    {categoryOptions.map((category: Category) => (
+                      <MenuItem key={category._id} value={category._id}>
+                        {category.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                
+                <TextField
+                  fullWidth
+                  label="Brand"
+                  value={formData.brand}
+                  onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                  error={!!formErrors.brand}
+                  helperText={formErrors.brand}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: '#dee2e6' },
+                      '&:hover fieldset': { borderColor: '#495057' },
+                      '&.Mui-focused fieldset': { borderColor: '#495057' }
+                    }
+                  }}
+                />
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
-              <TextField
-                fullWidth
-                label="Min Stock Level"
-                type="number"
-                value={formData.minStockLevel}
-                onChange={(e) => setFormData({ ...formData, minStockLevel: e.target.value })}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: '#dee2e6' },
-                    '&:hover fieldset': { borderColor: '#495057' },
-                    '&.Mui-focused fieldset': { borderColor: '#495057' }
-                  }
-                }}
-              />
-              
-              <TextField
-                fullWidth
-                label="Max Stock Level"
-                type="number"
-                value={formData.maxStockLevel}
-                onChange={(e) => setFormData({ ...formData, maxStockLevel: e.target.value })}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: '#dee2e6' },
-                    '&:hover fieldset': { borderColor: '#495057' },
-                    '&.Mui-focused fieldset': { borderColor: '#495057' }
-                  }
-                }}
-              />
-              
-              <TextField
-                fullWidth
-                label="Reorder Level"
-                type="number"
-                value={formData.reorderLevel}
-                onChange={(e) => setFormData({ ...formData, reorderLevel: e.target.value })}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: '#dee2e6' },
-                    '&:hover fieldset': { borderColor: '#495057' },
-                    '&.Mui-focused fieldset': { borderColor: '#495057' }
-                  }
-                }}
-              />
+                <FormControl fullWidth>
+                  <InputLabel>Unit</InputLabel>
+                  <Select
+                    value={formData.unit}
+                    label="Unit"
+                    onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                    sx={{
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: '#dee2e6' },
+                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#495057' },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#495057' }
+                    }}
+                  >
+                    <MenuItem value="piece">Piece</MenuItem>
+                    <MenuItem value="kg">Kilogram</MenuItem>
+                    <MenuItem value="liter">Liter</MenuItem>
+                    <MenuItem value="meter">Meter</MenuItem>
+                    <MenuItem value="box">Box</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 2 }}>
+                <TextField
+                  fullWidth
+                  label="Cost Price"
+                  type="number"
+                  value={formData.costPrice}
+                  onChange={(e) => setFormData({ ...formData, costPrice: e.target.value })}
+                  error={!!formErrors.costPrice}
+                  helperText={formErrors.costPrice}
+                  slotProps={{
+                    input: {
+                      startAdornment: <InputAdornment position="start">$</InputAdornment>
+                    }
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: '#dee2e6' },
+                      '&:hover fieldset': { borderColor: '#495057' },
+                      '&.Mui-focused fieldset': { borderColor: '#495057' }
+                    }
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
+                  label="Selling Price"
+                  type="number"
+                  value={formData.sellingPrice}
+                  onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value })}
+                  error={!!formErrors.sellingPrice}
+                  helperText={formErrors.sellingPrice}
+                  slotProps={{
+                    input: {
+                      startAdornment: <InputAdornment position="start">$</InputAdornment>
+                    }
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: '#dee2e6' },
+                      '&:hover fieldset': { borderColor: '#495057' },
+                      '&.Mui-focused fieldset': { borderColor: '#495057' }
+                    }
+                  }}
+                />
+              </Box>
+
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
+                <TextField
+                  fullWidth
+                  label="Min Stock Level"
+                  type="number"
+                  value={formData.minStockLevel}
+                  onChange={(e) => setFormData({ ...formData, minStockLevel: e.target.value })}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: '#dee2e6' },
+                      '&:hover fieldset': { borderColor: '#495057' },
+                      '&.Mui-focused fieldset': { borderColor: '#495057' }
+                    }
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
+                  label="Max Stock Level"
+                  type="number"
+                  value={formData.maxStockLevel}
+                  onChange={(e) => setFormData({ ...formData, maxStockLevel: e.target.value })}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: '#dee2e6' },
+                      '&:hover fieldset': { borderColor: '#495057' },
+                      '&.Mui-focused fieldset': { borderColor: '#495057' }
+                    }
+                  }}
+                />
+                
+                <TextField
+                  fullWidth
+                  label="Reorder Level"
+                  type="number"
+                  value={formData.reorderLevel}
+                  onChange={(e) => setFormData({ ...formData, reorderLevel: e.target.value })}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: '#dee2e6' },
+                      '&:hover fieldset': { borderColor: '#495057' },
+                      '&.Mui-focused fieldset': { borderColor: '#495057' }
+                    }
+                  }}
+                />
+              </Box>
             </Box>
-          </Box>
+          </TabPanel>
+          
+          <TabPanel value={tabValue} index={1}>
+            {editingProduct ? (
+              <Box sx={{ pt: 1 }}>
+                <ProductImageManager
+                  productSlug={editingProduct.slug}
+                  images={productImages}
+                  onImagesChange={setProductImages}
+                  maxImages={10}
+                  disabled={false}
+                />
+              </Box>
+            ) : (
+              <Box sx={{ pt: 1, textAlign: 'center' }}>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                  Please save the product first to upload images.
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  You can add images after creating the product by editing it.
+                </Typography>
+              </Box>
+            )}
+          </TabPanel>
         </DialogContent>
         <DialogActions sx={{ 
           bgcolor: '#f8f9fa', 
@@ -933,7 +1064,7 @@ const Products: React.FC = () => {
             Cancel
           </Button>
           <Button
-            onClick={handleSubmit}
+            onClick={() => handleSubmit()}
             variant="contained"
             disabled={createMutation.isPending || updateMutation.isPending}
             sx={{
