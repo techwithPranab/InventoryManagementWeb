@@ -1,0 +1,30 @@
+[{
+  "_id": {
+    "$oid": "6902d51d0af7cba1e7cb432a"
+  },
+  "name": "Barrackpore Distribution Center",
+  "code": "BDC001",
+  "address": {
+    "street": "Plot No. 45, Industrial Area",
+    "city": "Barrackpore",
+    "state": "West Bengal",
+    "zipCode": "700120",
+    "country": "India"
+  },
+  "manager": {
+    "$oid": "6902d51c0af7cba1e7cb42b9"
+  },
+  "capacity": 15000,
+  "currentOccupancy": 3500,
+  "isActive": true,
+  "createdBy": {
+    "$oid": "6902d51c0af7cba1e7cb42b8"
+  },
+  "createdAt": {
+    "$date": "2025-11-02T17:00:00.000Z"
+  },
+  "updatedAt": {
+    "$date": "2025-11-02T17:00:00.000Z"
+  },
+  "__v": 0
+}]

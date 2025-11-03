@@ -1,0 +1,534 @@
+[
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4337"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb4317"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 750,
+    "reservedQuantity": 25,
+    "location": {
+      "aisle": "A1",
+      "shelf": "S1",
+      "bin": "B01"
+    },
+    "lastRestocked": {
+      "$date": "2025-11-02T15:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4338"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb4318"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 1200,
+    "reservedQuantity": 50,
+    "location": {
+      "aisle": "A1",
+      "shelf": "S2",
+      "bin": "B02"
+    },
+    "lastRestocked": {
+      "$date": "2025-11-02T14:30:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4339"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb4319"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 2500,
+    "reservedQuantity": 100,
+    "location": {
+      "aisle": "A1",
+      "shelf": "S3",
+      "bin": "B03"
+    },
+    "lastRestocked": {
+      "$date": "2025-11-01T16:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb433a"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb431a"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 85,
+    "reservedQuantity": 5,
+    "location": {
+      "aisle": "A2",
+      "shelf": "S1",
+      "bin": "B04"
+    },
+    "lastRestocked": {
+      "$date": "2025-10-30T12:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb433b"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb431b"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 120,
+    "reservedQuantity": 8,
+    "location": {
+      "aisle": "A2",
+      "shelf": "S2",
+      "bin": "B05"
+    },
+    "lastRestocked": {
+      "$date": "2025-11-01T10:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb433c"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb431c"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 180,
+    "reservedQuantity": 12,
+    "location": {
+      "aisle": "A2",
+      "shelf": "S3",
+      "bin": "B06"
+    },
+    "lastRestocked": {
+      "$date": "2025-11-01T14:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb433d"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb431d"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 95,
+    "reservedQuantity": 5,
+    "location": {
+      "aisle": "A2",
+      "shelf": "S4",
+      "bin": "B07"
+    },
+    "lastRestocked": {
+      "$date": "2025-10-28T11:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb433e"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb431e"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 350,
+    "reservedQuantity": 25,
+    "location": {
+      "aisle": "A3",
+      "shelf": "S1",
+      "bin": "B08"
+    },
+    "lastRestocked": {
+      "$date": "2025-11-02T08:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb433f"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb431f"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 240,
+    "reservedQuantity": 15,
+    "location": {
+      "aisle": "A3",
+      "shelf": "S2",
+      "bin": "B09"
+    },
+    "lastRestocked": {
+      "$date": "2025-11-01T09:30:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4340"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb4320"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 150,
+    "reservedQuantity": 10,
+    "location": {
+      "aisle": "A3",
+      "shelf": "S3",
+      "bin": "B10"
+    },
+    "lastRestocked": {
+      "$date": "2025-11-02T07:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4341"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb4321"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 480,
+    "reservedQuantity": 30,
+    "location": {
+      "aisle": "A4",
+      "shelf": "S1",
+      "bin": "B11"
+    },
+    "lastRestocked": {
+      "$date": "2025-11-02T13:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4342"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb4322"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 75,
+    "reservedQuantity": 5,
+    "location": {
+      "aisle": "A4",
+      "shelf": "S2",
+      "bin": "B12"
+    },
+    "lastRestocked": {
+      "$date": "2025-11-01T11:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4343"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb4323"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 600,
+    "reservedQuantity": 40,
+    "location": {
+      "aisle": "A5",
+      "shelf": "S1",
+      "bin": "B13"
+    },
+    "lastRestocked": {
+      "$date": "2025-11-02T10:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4344"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb4324"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 850,
+    "reservedQuantity": 50,
+    "location": {
+      "aisle": "A5",
+      "shelf": "S2",
+      "bin": "B14"
+    },
+    "lastRestocked": {
+      "$date": "2025-11-02T09:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4345"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb4325"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 180,
+    "reservedQuantity": 12,
+    "location": {
+      "aisle": "A6",
+      "shelf": "S1",
+      "bin": "B15"
+    },
+    "lastRestocked": {
+      "$date": "2025-10-31T15:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4346"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb4326"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 125,
+    "reservedQuantity": 8,
+    "location": {
+      "aisle": "A6",
+      "shelf": "S2",
+      "bin": "B16"
+    },
+    "lastRestocked": {
+      "$date": "2025-10-30T14:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4347"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb4327"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 90,
+    "reservedQuantity": 6,
+    "location": {
+      "aisle": "A7",
+      "shelf": "S1",
+      "bin": "B17"
+    },
+    "lastRestocked": {
+      "$date": "2025-10-29T16:30:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4348"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb4328"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 110,
+    "reservedQuantity": 7,
+    "location": {
+      "aisle": "A7",
+      "shelf": "S2",
+      "bin": "B18"
+    },
+    "lastRestocked": {
+      "$date": "2025-10-31T12:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4349"
+    },
+    "product": {
+      "$oid": "6902d51d0af7cba1e7cb4329"
+    },
+    "warehouse": {
+      "$oid": "6902d51d0af7cba1e7cb432a"
+    },
+    "quantity": 420,
+    "reservedQuantity": 30,
+    "location": {
+      "aisle": "A8",
+      "shelf": "S1",
+      "bin": "B19"
+    },
+    "lastRestocked": {
+      "$date": "2025-11-02T06:00:00.000Z"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  }
+]

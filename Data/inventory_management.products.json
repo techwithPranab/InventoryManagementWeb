@@ -1,0 +1,591 @@
+[
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4317"
+    },
+    "name": "fresho! Tomato - Local (Loose)",
+    "sku": "FRS-TOM-500G",
+    "slug": "fresho-tomato-local-loose-frs-tom-500g",
+    "description": "Fresh local tomatoes, perfect for cooking and salads",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4301"
+    },
+    "brand": "fresho!",
+    "unit": "kg",
+    "costPrice": 8,
+    "sellingPrice": 10,
+    "minStockLevel": 50,
+    "maxStockLevel": 500,
+    "reorderLevel": 75,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4318"
+    },
+    "name": "fresho! Onion",
+    "sku": "FRS-ONI-2KG",
+    "slug": "fresho-onion-frs-oni-2kg",
+    "description": "Fresh quality onions for everyday cooking",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4301"
+    },
+    "brand": "fresho!",
+    "unit": "kg",
+    "costPrice": 23,
+    "sellingPrice": 46,
+    "minStockLevel": 100,
+    "maxStockLevel": 1000,
+    "reorderLevel": 150,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4319"
+    },
+    "name": "fresho! Potato",
+    "sku": "FRS-POT-1KG",
+    "slug": "fresho-potato-frs-pot-1kg",
+    "description": "New crop potatoes, perfect for all dishes",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4301"
+    },
+    "brand": "fresho!",
+    "unit": "kg",
+    "costPrice": 27,
+    "sellingPrice": 34,
+    "minStockLevel": 200,
+    "maxStockLevel": 2000,
+    "reorderLevel": 300,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb431a"
+    },
+    "name": "Nandini Pure Ghee/Tuppa",
+    "sku": "NAN-GHE-1L",
+    "slug": "nandini-pure-gheetuppa-nan-ghe-1l",
+    "description": "Pure cow ghee with rich taste and aroma",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4302"
+    },
+    "brand": "Nandini",
+    "unit": "litre",
+    "costPrice": 520,
+    "sellingPrice": 566,
+    "minStockLevel": 20,
+    "maxStockLevel": 200,
+    "reorderLevel": 30,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb431b"
+    },
+    "name": "Aashirvaad Atta - Whole Wheat",
+    "sku": "ASH-ATT-5KG",
+    "slug": "aashirvaad-atta-whole-wheat-ash-att-5kg",
+    "description": "Premium quality whole wheat flour for healthy rotis",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4302"
+    },
+    "brand": "Aashirvaad",
+    "unit": "kg",
+    "costPrice": 190,
+    "sellingPrice": 215,
+    "minStockLevel": 50,
+    "maxStockLevel": 500,
+    "reorderLevel": 75,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb431c"
+    },
+    "name": "Fortune Sunlite Refined Sunflower Oil",
+    "sku": "FOR-SUN-1L",
+    "slug": "fortune-sunlite-refined-sunflower-oil-for-sun-1l",
+    "description": "Pure refined sunflower oil for healthy cooking",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4302"
+    },
+    "brand": "Fortune",
+    "unit": "litre",
+    "costPrice": 130,
+    "sellingPrice": 153,
+    "minStockLevel": 30,
+    "maxStockLevel": 300,
+    "reorderLevel": 45,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb431d"
+    },
+    "name": "Tata Sampann Toor Dal",
+    "sku": "TAT-DAL-2KG",
+    "slug": "tata-sampann-toor-dal-tat-dal-2kg",
+    "description": "Unpolished toor dal rich in protein and nutrients",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4302"
+    },
+    "brand": "Tata Sampann",
+    "unit": "kg",
+    "costPrice": 250,
+    "sellingPrice": 279,
+    "minStockLevel": 40,
+    "maxStockLevel": 400,
+    "reorderLevel": 60,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb431e"
+    },
+    "name": "Nandini Pasteurised Toned Milk",
+    "sku": "NAN-MLK-1L",
+    "slug": "nandini-pasteurised-toned-milk-nan-mlk-1l",
+    "description": "Fresh toned milk with essential nutrients",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4303"
+    },
+    "brand": "Nandini",
+    "unit": "litre",
+    "costPrice": 32,
+    "sellingPrice": 37,
+    "minStockLevel": 100,
+    "maxStockLevel": 500,
+    "reorderLevel": 150,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb431f"
+    },
+    "name": "Amul Butter - Pasteurised",
+    "sku": "AML-BUT-100G",
+    "slug": "amul-butter-pasteurised-aml-but-100g",
+    "description": "Fresh pasteurised butter for bread and cooking",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4303"
+    },
+    "brand": "Amul",
+    "unit": "piece",
+    "costPrice": 50,
+    "sellingPrice": 55,
+    "minStockLevel": 50,
+    "maxStockLevel": 500,
+    "reorderLevel": 75,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4320"
+    },
+    "name": "Britannia Whole Wheat Bread",
+    "sku": "BRI-BRD-400G",
+    "slug": "britannia-whole-wheat-bread-bri-brd-400g",
+    "description": "100% whole wheat bread with no maida",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4303"
+    },
+    "brand": "Britannia",
+    "unit": "piece",
+    "costPrice": 45,
+    "sellingPrice": 52,
+    "minStockLevel": 30,
+    "maxStockLevel": 300,
+    "reorderLevel": 45,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4321"
+    },
+    "name": "Coca-Cola Original Taste",
+    "sku": "COC-COL-600ML",
+    "slug": "coca-cola-original-taste-coc-col-600ml",
+    "description": "Classic refreshing cola drink",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4304"
+    },
+    "brand": "Coca-Cola",
+    "unit": "piece",
+    "costPrice": 35,
+    "sellingPrice": 40,
+    "minStockLevel": 100,
+    "maxStockLevel": 1000,
+    "reorderLevel": 150,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4322"
+    },
+    "name": "Tropicana Mixed Fruit Juice",
+    "sku": "TRP-MIX-1L",
+    "slug": "tropicana-mixed-fruit-juice-trp-mix-1l",
+    "description": "100% fruit juice with no added sugar",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4304"
+    },
+    "brand": "Tropicana",
+    "unit": "litre",
+    "costPrice": 180,
+    "sellingPrice": 200,
+    "minStockLevel": 40,
+    "maxStockLevel": 400,
+    "reorderLevel": 60,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4323"
+    },
+    "name": "Lay's Classic Salted Chips",
+    "sku": "LAY-CLS-52G",
+    "slug": "lays-classic-salted-chips-lay-cls-52g",
+    "description": "Crispy potato chips with classic salt flavor",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4305"
+    },
+    "brand": "Lay's",
+    "unit": "piece",
+    "costPrice": 18,
+    "sellingPrice": 20,
+    "minStockLevel": 100,
+    "maxStockLevel": 1000,
+    "reorderLevel": 150,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4324"
+    },
+    "name": "Maggi 2-Minute Masala Noodles",
+    "sku": "MAG-NUD-70G",
+    "slug": "maggi-2-minute-masala-noodles-mag-nud-70g",
+    "description": "Instant noodles with masala flavor",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4305"
+    },
+    "brand": "Maggi",
+    "unit": "piece",
+    "costPrice": 12,
+    "sellingPrice": 14,
+    "minStockLevel": 200,
+    "maxStockLevel": 2000,
+    "reorderLevel": 300,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4325"
+    },
+    "name": "Dove Beauty Bar Soap",
+    "sku": "DOV-BAR-100G",
+    "slug": "dove-beauty-bar-soap-dov-bar-100g",
+    "description": "Moisturizing beauty bar with 1/4 moisturizing cream",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4306"
+    },
+    "brand": "Dove",
+    "unit": "piece",
+    "costPrice": 60,
+    "sellingPrice": 70,
+    "minStockLevel": 50,
+    "maxStockLevel": 500,
+    "reorderLevel": 75,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4326"
+    },
+    "name": "Colgate Total Advanced Health Toothpaste",
+    "sku": "COL-TPA-150G",
+    "slug": "colgate-total-advanced-health-toothpaste-col-tpa-150g",
+    "description": "Complete oral care with 12-hour protection",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4306"
+    },
+    "brand": "Colgate",
+    "unit": "piece",
+    "costPrice": 95,
+    "sellingPrice": 110,
+    "minStockLevel": 30,
+    "maxStockLevel": 300,
+    "reorderLevel": 45,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4327"
+    },
+    "name": "Surf Excel Matic Liquid Detergent",
+    "sku": "SUR-LIQ-1L",
+    "slug": "surf-excel-matic-liquid-detergent-sur-liq-1l",
+    "description": "Powerful liquid detergent for washing machines",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4307"
+    },
+    "brand": "Surf Excel",
+    "unit": "litre",
+    "costPrice": 280,
+    "sellingPrice": 320,
+    "minStockLevel": 25,
+    "maxStockLevel": 250,
+    "reorderLevel": 40,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4328"
+    },
+    "name": "Harpic Power Plus Toilet Cleaner",
+    "sku": "HAR-PWR-500ML",
+    "slug": "harpic-power-plus-toilet-cleaner-har-pwr-500ml",
+    "description": "Powerful toilet bowl cleaner with 10x cleaning power",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4307"
+    },
+    "brand": "Harpic",
+    "unit": "piece",
+    "costPrice": 85,
+    "sellingPrice": 100,
+    "minStockLevel": 40,
+    "maxStockLevel": 400,
+    "reorderLevel": 60,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4329"
+    },
+    "name": "Country Eggs - Fresh",
+    "sku": "EGG-CTR-6PC",
+    "slug": "country-eggs-fresh-egg-ctr-6pc",
+    "description": "Farm fresh country eggs, rich in protein",
+    "category": {
+      "$oid": "6902d51d0af7cba1e7cb4309"
+    },
+    "brand": "Country Eggs",
+    "unit": "piece",
+    "costPrice": 30,
+    "sellingPrice": 36,
+    "minStockLevel": 100,
+    "maxStockLevel": 500,
+    "reorderLevel": 150,
+    "images": [],
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  }
+]

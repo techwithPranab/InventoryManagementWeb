@@ -1,0 +1,302 @@
+[
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb432b"
+    },
+    "name": "Karnataka Milk Federation",
+    "address": {
+      "street": "KMF Bhavan, Milk Colony, Hebbal",
+      "city": "Bengaluru",
+      "state": "Karnataka",
+      "zipCode": "560024",
+      "country": "India"
+    },
+    "contactPerson": "Dr. M. K. Jagadish",
+    "phone": "+91-80-2341-7777",
+    "email": "info@kmfnandini.coop",
+    "website": "https://www.kmfnandini.coop",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb432c"
+    },
+    "name": "ITC Limited",
+    "address": {
+      "street": "Virginia House, 37 J.L. Nehru Road",
+      "city": "Kolkata",
+      "state": "West Bengal",
+      "zipCode": "700071",
+      "country": "India"
+    },
+    "contactPerson": "Sanjiv Puri",
+    "phone": "+91-33-2288-9371",
+    "email": "corporate@itc.in",
+    "website": "https://www.itcportal.com",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb432d"
+    },
+    "name": "Adani Wilmar Limited",
+    "address": {
+      "street": "Fortune House, Nr. Navrangpura Railway Crossing",
+      "city": "Ahmedabad",
+      "state": "Gujarat",
+      "zipCode": "380009",
+      "country": "India"
+    },
+    "contactPerson": "Angshu Mallick",
+    "phone": "+91-79-2656-3713",
+    "email": "info@adaniwilmar.com",
+    "website": "https://www.adaniwilmar.com",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb432e"
+    },
+    "name": "Tata Consumer Products Limited",
+    "address": {
+      "street": "1, Bishop Lefroy Road",
+      "city": "Kolkata",
+      "state": "West Bengal",
+      "zipCode": "700020",
+      "country": "India"
+    },
+    "contactPerson": "Sunil D'Souza",
+    "phone": "+91-33-6636-5000",
+    "email": "investor.relations@tatacp.com",
+    "website": "https://www.tataconsumer.com",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb432f"
+    },
+    "name": "Gujarat Cooperative Milk Marketing Federation",
+    "address": {
+      "street": "GCMMF House, B/h AMUL Dairy, Moghul Lane",
+      "city": "Anand",
+      "state": "Gujarat",
+      "zipCode": "388001",
+      "country": "India"
+    },
+    "contactPerson": "R.S. Sodhi",
+    "phone": "+91-2692-258506",
+    "email": "marketing@amul.coop",
+    "website": "https://www.amul.com",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4330"
+    },
+    "name": "Britannia Industries Limited",
+    "address": {
+      "street": "Britannia House, 1-A, Hungerford Street",
+      "city": "Kolkata",
+      "state": "West Bengal",
+      "zipCode": "700017",
+      "country": "India"
+    },
+    "contactPerson": "Varun Berry",
+    "phone": "+91-33-2229-7471",
+    "email": "corp.comm@britindia.com",
+    "website": "https://www.britannia.co.in",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4331"
+    },
+    "name": "Coca-Cola India Private Limited",
+    "address": {
+      "street": "Unit No. 701-702, 7th Floor, Platina Building, Plot No. C-59",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "zipCode": "400051",
+      "country": "India"
+    },
+    "contactPerson": "Sanket Ray",
+    "phone": "+91-22-6692-2000",
+    "email": "info@coca-colaindia.com",
+    "website": "https://www.coca-colaindia.com",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4332"
+    },
+    "name": "PepsiCo India Holdings Private Limited",
+    "address": {
+      "street": "1st Floor, Tower A, DLF Corporate Greens, Sector 74A",
+      "city": "Gurugram",
+      "state": "Haryana",
+      "zipCode": "122004",
+      "country": "India"
+    },
+    "contactPerson": "Ahmed ElSheikh",
+    "phone": "+91-124-4097-000",
+    "email": "info@pepsico.com",
+    "website": "https://www.pepsico.co.in",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4333"
+    },
+    "name": "Nestle India Limited",
+    "address": {
+      "street": "100, Shantivan Complex, Sector-14",
+      "city": "Gurugram",
+      "state": "Haryana",
+      "zipCode": "122014",
+      "country": "India"
+    },
+    "contactPerson": "Suresh Narayanan",
+    "phone": "+91-124-3940-000",
+    "email": "contact@nestle.in",
+    "website": "https://www.nestle.in",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4334"
+    },
+    "name": "Hindustan Unilever Limited",
+    "address": {
+      "street": "Unilever House, B.D. Sawant Marg, Chakala",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "zipCode": "400099",
+      "country": "India"
+    },
+    "contactPerson": "Sanjiv Mehta",
+    "phone": "+91-22-6695-9000",
+    "email": "investor.helpline@unilever.com",
+    "website": "https://www.hul.co.in",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4335"
+    },
+    "name": "Colgate-Palmolive (India) Limited",
+    "address": {
+      "street": "Colgate Research Centre, Main Street, Hiranandani Gardens",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "zipCode": "400076",
+      "country": "India"
+    },
+    "contactPerson": "Ram Raghavan",
+    "phone": "+91-22-6797-7000",
+    "email": "investor_relations@colpal.com",
+    "website": "https://www.colgatepalmolive.co.in",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4336"
+    },
+    "name": "Reckitt Benckiser (India) Private Limited",
+    "address": {
+      "street": "7th Floor, Tower B, Building No. 5, DLF Cyber City",
+      "city": "Gurugram",
+      "state": "Haryana",
+      "zipCode": "122002",
+      "country": "India"
+    },
+    "contactPerson": "Gaurav Jain",
+    "phone": "+91-124-4576-000",
+    "email": "info@reckitt.com",
+    "website": "https://www.reckitt.com",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  }
+]

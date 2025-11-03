@@ -1,0 +1,306 @@
+[
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4301"
+    },
+    "name": "Fruits & Vegetables",
+    "description": "Fresh fruits, vegetables, herbs and organic produce",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4302"
+    },
+    "name": "Foodgrains, Oil & Masala",
+    "description": "Rice, dal, flour, edible oils, spices and condiments",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4303"
+    },
+    "name": "Bakery, Cakes & Dairy",
+    "description": "Milk, bread, cakes, cookies, cheese and dairy products",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4304"
+    },
+    "name": "Beverages",
+    "description": "Juices, soft drinks, tea, coffee, energy drinks and water",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4305"
+    },
+    "name": "Snacks & Branded Foods",
+    "description": "Chips, biscuits, noodles, ready-to-eat foods and snacks",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4306"
+    },
+    "name": "Beauty & Hygiene",
+    "description": "Personal care, cosmetics, skincare, haircare and hygiene products",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4307"
+    },
+    "name": "Cleaning & Household",
+    "description": "Detergents, floor cleaners, air fresheners and household supplies",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4308"
+    },
+    "name": "Kitchen, Garden & Pets",
+    "description": "Kitchen utensils, gardening supplies and pet care products",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4309"
+    },
+    "name": "Eggs, Meat & Fish",
+    "description": "Fresh eggs, chicken, mutton, fish and seafood",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4310"
+    },
+    "name": "Gourmet & World Food",
+    "description": "International cuisine, gourmet ingredients and specialty foods",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4311"
+    },
+    "name": "Baby Care",
+    "description": "Baby food, diapers, wipes, toys and baby care products",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4312"
+    },
+    "name": "Pharmacy & Wellness",
+    "description": "Medicines, health supplements, medical devices and wellness products",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4313"
+    },
+    "name": "Electronics",
+    "description": "Mobile phones, laptops, headphones, home appliances and gadgets",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4314"
+    },
+    "name": "Fashion",
+    "description": "Clothing, footwear, accessories and fashion items",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4315"
+    },
+    "name": "Food Court",
+    "description": "Ready-to-eat meals, restaurant food and quick bites",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6902d51d0af7cba1e7cb4316"
+    },
+    "name": "Paan Corner",
+    "description": "Paan, tobacco products, cigarettes and related items",
+    "image": "",
+    "isActive": true,
+    "createdBy": {
+      "$oid": "6902d51c0af7cba1e7cb42b8"
+    },
+    "createdAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-02T17:00:00.000Z"
+    },
+    "__v": 0
+  }
+]
