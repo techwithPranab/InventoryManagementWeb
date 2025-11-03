@@ -7,8 +7,42 @@ const router = express.Router();
 router.get('/', [auth, requireClientCode], async (req, res) => {
   try {
     const { Supplier } = req.models;
-    const suppliers = await Supplier.find().sort({ name: 1 });
-    res.json(suppliers);
+
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = 'name',
+      sortOrder = 'asc'
+    } = req.query;
+
+    const query = {};
+    const sort = {};
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { contactPerson: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { notes: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+
+    const suppliers = await Supplier.find(query)
+      .sort(sort)
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const total = await Supplier.countDocuments(query);
+
+    res.json({
+      suppliers,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+      total
+    });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }

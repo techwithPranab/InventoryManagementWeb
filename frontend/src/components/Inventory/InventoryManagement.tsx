@@ -490,14 +490,14 @@ const InventoryManagement: React.FC = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'INR'
     }).format(amount);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('en-IN', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -625,7 +625,7 @@ const InventoryManagement: React.FC = () => {
         <Card>
           <CardContent>
             <Box display="flex" alignItems="center">
-              <MoneyIcon color="info" sx={{ fontSize: 40, mr: 2 }} />
+             
               <Box>
                 <Typography variant="h5" fontWeight="bold">
                   {formatCurrency(summary.totalValue || 0)}

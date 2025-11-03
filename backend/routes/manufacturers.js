@@ -7,8 +7,42 @@ const router = express.Router();
 router.get('/', [auth, requireClientCode], async (req, res) => {
   try {
     const { Manufacturer } = req.models;
-    const manufacturers = await Manufacturer.find().sort({ name: 1 });
-    res.json(manufacturers);
+
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = 'name',
+      sortOrder = 'asc'
+    } = req.query;
+
+    const query = {};
+    const sort = {};
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { contactPerson: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { notes: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+
+    const manufacturers = await Manufacturer.find(query)
+      .sort(sort)
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const total = await Manufacturer.countDocuments(query);
+
+    res.json({
+      manufacturers,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+      total
+    });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }

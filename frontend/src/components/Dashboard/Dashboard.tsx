@@ -160,16 +160,16 @@ const Dashboard: React.FC = () => {
   });
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
   };
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('en-US', {
+    return new Date(date).toLocaleDateString('en-IN', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -204,7 +204,7 @@ const Dashboard: React.FC = () => {
             Welcome back! Here's what's happening with your inventory.
           </Typography>
         </Box>
-        <Box display="flex" gap={1}>
+        {/* <Box display="flex" gap={1}>
           <Tooltip title="Manage API Token">
             <Button
               variant="outlined"
@@ -229,7 +229,7 @@ const Dashboard: React.FC = () => {
               <Refresh />
             </IconButton>
           </Tooltip>
-        </Box>
+        </Box> */}
       </Box>
 
       {/* Overview Cards */}
